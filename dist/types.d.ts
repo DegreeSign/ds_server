@@ -3,13 +3,14 @@ interface ExpressServerFunctions {
     start: () => void;
 }
 interface APIData<T> {
+    endPoint: string;
     ips: string;
     req: any;
     res: any;
     fun: (p: T) => any;
 }
 interface ListenerSpec<T> {
-    type: string;
+    endPoint: string;
     task: string;
     fun: (p: T) => any;
 }

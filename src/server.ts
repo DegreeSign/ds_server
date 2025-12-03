@@ -193,16 +193,17 @@ const
             serverObj = expressServer(port, allowedOrigins),
             /** API listener */
             listenAPI = ({
-                type,
+                endPoint,
                 task,
                 fun
             }: ListenerSpec<T>) =>
-                serverObj?.post(type, `REST API ${task} failed`, (
+                serverObj?.post(endPoint, `REST API ${task} failed`, (
                     ips: string,
                     req: any,
                     res: any,
                 ) => {
                     listenProcessor({
+                        endPoint,
                         ips,
                         req,
                         res,

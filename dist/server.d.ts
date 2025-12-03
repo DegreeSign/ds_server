@@ -1,5 +1,5 @@
 import { delayCode } from "@degreesign/utils";
-import { ExpressServerFunctions, ListenerSpec } from "./types";
+import { APIData, ExpressServerFunctions, ListenerSpec } from "./types";
 declare const ff: (res: any) => any, // cut connection
 rf: (res: any, data: any, success?: boolean) => any, // send a message
 /** Server system (Express) */
@@ -25,5 +25,10 @@ capVerify: (token?: string) => Promise<boolean | undefined>,
 /** fetch data */
 getData: (url: string, body?: any, headersData?: any, noCache?: boolean) => Promise<any>, 
 /** Start Listener */
-startListener: (listener: Function, listeners: ListenerSpec[], start?: Function) => void;
+startListener: <T>({ port, allowedOrigins, listenProcessor, listeners, }: {
+    port: number;
+    allowedOrigins?: string[];
+    listenProcessor: (p: APIData<T>) => any;
+    listeners: ListenerSpec<T>[];
+}) => void;
 export { expressServer, ff, rf, chkStg, txtShort, validLen, validLenEq, capVerify, genAPI, genRandomCodeSize, verAPI, genShortCode, getData, delayCode, startListener, };

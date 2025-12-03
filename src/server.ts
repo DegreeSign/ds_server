@@ -176,36 +176,43 @@ const
             return undefined
         }
     },
-
-    /** API listener */
-    listenAPI = (
-        endpoint: string,
-        task: string,
-        fun: (p: APIData) => void,
-        serverObj: ExpressServerFunctions,
-    ) => serverObj?.post(endpoint, `API ${task} failed`, (
-        ips: string,
-        req: any,
-        res: any,
-    ) => {
-        // TODO combine listeners into one function
-    }),
-
     /** Start Listener */
-    startListener = (
-        listener: Function,
-        listeners: ListenerSpec[],
-        start?: Function
-    ) => {
+    startListener = <T>({
+        port,
+        allowedOrigins,
+        listenProcessor,
+        listeners,
+    }: {
+        port: number;
+        allowedOrigins?: string[];
+        listenProcessor: (p: APIData<T>) => any;
+        listeners: ListenerSpec<T>[];
+    }) => {
+        const
+            /** Server object */
+            serverObj = expressServer(port, allowedOrigins),
+            /** API listener */
+            listenAPI = ({
+                type,
+                task,
+                fun
+            }: ListenerSpec<T>) =>
+                serverObj?.post(type, `REST API ${task} failed`, (
+                    ips: string,
+                    req: any,
+                    res: any,
+                ) => {
+                    listenProcessor({
+                        ips,
+                        req,
+                        res,
+                        fun
+                    });
+                });
         for (let i = 0; i < listeners.length; i++) {
             const listenerSpecs = listeners[i];
-            listener(
-                listenerSpecs.type,
-                listenerSpecs.task,
-                listenerSpecs.fun
-            );
+            listenAPI(listenerSpecs);
         };
-        start?.();
     };
 
 export {

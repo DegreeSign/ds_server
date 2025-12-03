@@ -1,6 +1,6 @@
 {
   "name": "@degreesign/server",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "main": "dist/node/degreesign.node.min.js",
   "module": "dist/node/degreesign.node.min.js",
   "browser": "dist/browser/degreesign.min.js",
@@ -46,7 +46,6 @@
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "hcaptcha": "^0.2.0",
-    "node-fetch": "^3.3.2",
     "speakeasy": "^2.0.0"
   },
   "files": [

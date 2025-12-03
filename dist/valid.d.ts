@@ -1,11 +1,8 @@
 import fs from "fs";
-import { StringObj } from "@degreesign/utils";
 import { ServerConfig, ServerConfigObj } from "./types";
 declare const 
 /** configurations */
 serverConfig: ServerConfig, getServerConfig: () => ServerConfig, setServerConfig: ({ cacheDir, encryptionKey, encryptionSalt, captchaSecret, sanitisationString, sanitisationStringExtended, overrideUserAgent, }: ServerConfigObj) => void, 
-/** Cache Folder */
-cacheKeys: StringObj, getCacheKeys: () => StringObj, addCacheKey: (customKey: string) => void, removeCacheKey: (customKey: string) => void, 
 /** Validate Folder */
 safeFolder: (targetFolder: string) => boolean, 
 /** Delete Folder */
@@ -37,4 +34,4 @@ saveFileLocally: ({ url, filePath }: {
     url: string;
     filePath: string;
 }) => Promise<boolean>;
-export { serverConfig, getServerConfig, setServerConfig, wrt, wrtJ, red, redJ, safeFolder, delFolder, fileStats, saveCache, readCache, cacheKeys, getCacheKeys, addCacheKey, removeCacheKey, en, de, hmacValid, cmd, saveFileLocally, };
+export { serverConfig, getServerConfig, setServerConfig, wrt, wrtJ, red, redJ, safeFolder, delFolder, fileStats, saveCache, readCache, en, de, hmacValid, cmd, saveFileLocally, };

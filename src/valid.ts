@@ -59,15 +59,6 @@ const
 		if (overrideUserAgent != undefined)
 			serverConfig.overrideUserAgent = overrideUserAgent;
 	},
-	/** Cache Folder */
-	cacheKeys: StringObj = {},
-	getCacheKeys = (): StringObj => cacheKeys,
-	addCacheKey = (customKey: string) => {
-		cacheKeys[customKey] = customKey;
-	},
-	removeCacheKey = (customKey: string) => {
-		delete cacheKeys[customKey];
-	},
 	/** Validate Folder */
 	safeFolder = (targetFolder: string) => {
 		try {
@@ -289,10 +280,6 @@ export {
 	fileStats,
 	saveCache,
 	readCache,
-	cacheKeys,
-	getCacheKeys,
-	addCacheKey,
-	removeCacheKey,
 	en,
 	de,
 	hmacValid,

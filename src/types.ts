@@ -11,7 +11,7 @@ interface APIData<T> {
     fun: (p: T) => any;
 }
 
-interface ListenerSpec<T> {
+interface ListenerSpecs<T> {
     endPoint: string,
     task: string,
     fun: (p: T) => any,
@@ -30,6 +30,6 @@ interface ServerConfig {
 export {
     ExpressServerFunctions,
     APIData,
-    ListenerSpec,
+    ListenerSpecs,
     ServerConfig,
 }

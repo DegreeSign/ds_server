@@ -1,6 +1,7 @@
 import { delayCode } from "@degreesign/utils";
 import { ff, rf, chkStg, txtShort, validLen, validLenEq, capVerify, genAPI, genRandomCodeSize, verAPI, genShortCode, getData, startListener } from "./server";
 import { wrt, wrtJ, red, redJ, safeFolder, delFolder, fileStats, saveCache, readCache, cacheKeys, serverConfig, en, de, hmacValid, cmd, saveFileLocally, addCacheKey, getCacheKeys, getServerConfig, removeCacheKey, setServerConfig } from "./valid";
+import { ServerConfig, APIData, ListenerSpecs } from "./types";
 
 export {
     serverConfig,
@@ -15,6 +16,7 @@ export {
     fileStats,
     saveCache,
     readCache,
+    ServerConfig,
     cacheKeys,
     getCacheKeys,
     addCacheKey,
@@ -38,4 +40,6 @@ export {
     getData,
     delayCode,
     startListener,
+    APIData,
+    ListenerSpecs,
 }

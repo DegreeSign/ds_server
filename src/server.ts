@@ -4,7 +4,7 @@ import cors from "cors"
 import { verify } from "hcaptcha"
 import speakeasy from "speakeasy"
 import { delayCode, seoDt, tN } from "@degreesign/utils"
-import { APIData, ExpressServerFunctions, ListenerSpec } from "./types"
+import { APIData, ExpressServerFunctions, ListenerSpecs } from "./types"
 import { serverConfig } from "./valid"
 
 const
@@ -186,7 +186,7 @@ const
         port: number;
         allowedOrigins?: string[];
         listenProcessor: (p: APIData<T>) => any;
-        listeners: ListenerSpec<T>[];
+        listeners: ListenerSpecs<T>[];
     }) => {
         const
             /** Server object */
@@ -196,7 +196,7 @@ const
                 endPoint,
                 task,
                 fun
-            }: ListenerSpec<T>) =>
+            }: ListenerSpecs<T>) =>
                 serverObj?.post(endPoint, `REST API ${task} failed`, (
                     ips: string,
                     req: any,

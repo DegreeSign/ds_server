@@ -1,5 +1,5 @@
 import { delayCode } from "@degreesign/utils";
-import { APIData, ListenerSpec } from "./types";
+import { APIData, ListenerSpecs } from "./types";
 declare const ff: (res: any) => any, // cut connection
 rf: (res: any, data: any, success?: boolean) => any, 
 /** Sanitise strings check */
@@ -27,6 +27,6 @@ startListener: <T>({ port, allowedOrigins, listenProcessor, listeners, }: {
     port: number;
     allowedOrigins?: string[];
     listenProcessor: (p: APIData<T>) => any;
-    listeners: ListenerSpec<T>[];
+    listeners: ListenerSpecs<T>[];
 }) => void;
 export { ff, rf, chkStg, txtShort, validLen, validLenEq, capVerify, genAPI, genRandomCodeSize, verAPI, genShortCode, getData, delayCode, startListener, };

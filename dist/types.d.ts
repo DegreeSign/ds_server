@@ -9,7 +9,7 @@ interface APIData<T> {
     res: any;
     fun: (p: T) => any;
 }
-interface ListenerSpec<T> {
+interface ListenerSpecs<T> {
     endPoint: string;
     task: string;
     fun: (p: T) => any;
@@ -23,4 +23,4 @@ interface ServerConfig {
     sanitisationStringExtended: string;
     overrideUserAgent: string;
 }
-export { ExpressServerFunctions, APIData, ListenerSpec, ServerConfig, };
+export { ExpressServerFunctions, APIData, ListenerSpecs, ServerConfig, };

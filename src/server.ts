@@ -213,6 +213,7 @@ const
             const listenerSpecs = listeners[i];
             listenAPI(listenerSpecs);
         };
+        serverObj?.start();
     };
 
 export {

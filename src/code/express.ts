@@ -1,22 +1,18 @@
-import fetch from "node-fetch"
 import express from "express"
 import cors from "cors"
-import { verify } from "hcaptcha"
-import speakeasy from "speakeasy"
-import { delayCode, seoDt, tN } from "@degreesign/utils"
+import { delayCode, seoDt } from "@degreesign/utils"
 import { APIData, ExpressServerFunctions, ListenerSpecs } from "./types"
-import { serverConfig } from "./valid"
 
 const
     // Server 💻
     ff = (res: any) => res ? res.status(504).send()
-        : console.log(tN(), `error cutting connection`), // cut connection
+        : console.log(seoDt(), `error cutting connection`), // cut connection
     rf = (res: any, data: any, success?: boolean) => res ? res.status(200).send({
         ...success == undefined ? {
             success: data?.e == undefined
         } : { success },
         ...data,
-    }) : console.log(tN(), `error sending data`), // send a message
+    }) : console.log(seoDt(), `error sending data`), // send a message
     /** Server system (Express) */
     expressServer = (
         port: number,
@@ -84,98 +80,6 @@ const
             return
         }
     },
-
-    /** Sanitise strings check */
-    chkStg = (txt?: string) =>
-        (typeof txt == `string` || typeof txt == `number`)
-            && (Number(txt) || Number(txt) == 0 || !txt.match(serverConfig.sanitisationString)) ? (txt + ``) : ``,
-    /** Shorten Text */
-    txtShort = (txt?: string, len = 15) =>
-        txt && typeof txt == `string` ? txt.slice(txt.length - len)
-            : ``,
-    /** Validate Length */
-    validLen = (len: number, txt?: string, checkNeg?: boolean) =>
-        txt && typeof txt == `string` && txt.length < len && (
-            !checkNeg || !txt.match(serverConfig.sanitisationStringExtended)
-        ),
-    /** Validate Length */
-    validLenEq = (len: number, txt?: string, checkNeg?: boolean) =>
-        txt && typeof txt == `string` && txt.length == len && (
-            !checkNeg || !txt.match(serverConfig.sanitisationStringExtended)
-        ),
-    /** Generate API Code */
-    genAPI = (
-        length: number
-    ) => speakeasy.generateSecret({ length }).base32,
-    /** Random code */
-    genRandomCodeSize = () => genAPI(Math.floor(Math.random() * 11 + 20)),
-    /** Short code */
-    genShortCode = () => genAPI(4),
-    /** Verify API Code */
-    verAPI = (auth: string, t: string) => {
-        try {
-            return speakeasy.totp
-                .verify({
-                    secret: auth,
-                    encoding: `base32`,
-                    token: t
-                });
-        } catch (e) {
-            console.log(tN(), `Verifying auth code failed`, e);
-            return undefined
-        };
-    },
-
-    // Captcha System
-    /** Captcha Verification */
-    capVerify = async (token?: string) => {
-        try {
-            if (token) {
-                const capRes = await verify(serverConfig.captchaSecret, token)
-                return capRes.success === true
-            };
-        } catch (e) {
-            console.log(`Captcha Function Failed`, e);
-        };
-        return
-    },
-
-    /** fetch data */
-    getData = async (
-        url: string,
-        body?: any,
-        headersData?: any,
-        noCache: boolean = true
-    ): Promise<any> => {
-        try {
-            const headers = headersData || {};
-            if (noCache) {
-                headers.cache = `no-store`;
-                headers[`Content-Type`] = `application/json`;
-                if (serverConfig.overrideUserAgent)
-                    headers[`User-Agent`] = serverConfig.overrideUserAgent;
-            };
-            const
-                raw = await fetch(
-                    url,
-                    {
-                        method: body ? `POST` : `GET`,
-                        headers,
-                        body
-                    }
-                ),
-                status = raw?.status,
-                data = status == 200
-                    || status == 201
-                    || status == 202
-                    ? await raw?.json() : undefined;
-
-            return data
-        } catch (e) {
-            console.log(seoDt(), `fetching data error`, e);
-            return undefined
-        }
-    },
     /** Start Listener */
     startListener = <T>({
         port,
@@ -220,16 +124,6 @@ const
 export {
     ff,
     rf,
-    chkStg,
-    txtShort,
-    validLen,
-    validLenEq,
-    capVerify,
-    genAPI,
-    genRandomCodeSize,
-    verAPI,
-    genShortCode,
-    getData,
     delayCode,
     startListener,
 }

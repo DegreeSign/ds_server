@@ -9,9 +9,6 @@ const commonConfig: Configuration = {
     entry: `./src/index.ts`, // Entry point for your library
     resolve: {
         extensions: [`.ts`, `.js`], // Resolve .ts and .js files
-        fallback: {
-            fetch: require.resolve(`node-fetch`),
-        },
     },
     module: {
         rules: [
@@ -53,7 +50,7 @@ module.exports = [{
 // }, {
     // Node.js configuration
     ...commonConfig,
-    target: `node`,
+    target: `node18`,
     resolve: {
         ...commonConfig.resolve,
         mainFields: [`module`, `main`],

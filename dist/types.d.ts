@@ -23,4 +23,13 @@ interface ServerConfig {
     sanitisationStringExtended: string;
     overrideUserAgent: string;
 }
-export { ExpressServerFunctions, APIData, ListenerSpecs, ServerConfig, };
+interface ServerConfigObj {
+    cacheDir?: string;
+    encryptionKey?: string;
+    encryptionSalt?: string;
+    captchaSecret?: string;
+    sanitisationString?: string;
+    sanitisationStringExtended?: string;
+    overrideUserAgent?: string;
+}
+export { ExpressServerFunctions, APIData, ListenerSpecs, ServerConfig, ServerConfigObj, };

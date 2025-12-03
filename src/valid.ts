@@ -12,7 +12,7 @@ import {
 import https from 'https'
 import http from 'http'
 import { StringObj, objLen, seoDt, tN } from "@degreesign/utils"
-import { ServerConfig } from "./types";
+import { ServerConfig, ServerConfigObj } from "./types";
 
 const
 	/** configurations */
@@ -37,7 +37,7 @@ const
 		sanitisationString,
 		sanitisationStringExtended,
 		overrideUserAgent,
-	}: ServerConfig) => {
+	}: ServerConfigObj) => {
 		if (cacheDir != undefined)
 			serverConfig.cacheDir = cacheDir;
 

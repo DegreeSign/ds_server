@@ -1,9 +1,9 @@
 import fs from "fs";
 import { StringObj } from "@degreesign/utils";
-import { ServerConfig } from "./types";
+import { ServerConfig, ServerConfigObj } from "./types";
 declare const 
 /** configurations */
-serverConfig: ServerConfig, getServerConfig: () => ServerConfig, setServerConfig: ({ cacheDir, encryptionKey, encryptionSalt, captchaSecret, sanitisationString, sanitisationStringExtended, overrideUserAgent, }: ServerConfig) => void, 
+serverConfig: ServerConfig, getServerConfig: () => ServerConfig, setServerConfig: ({ cacheDir, encryptionKey, encryptionSalt, captchaSecret, sanitisationString, sanitisationStringExtended, overrideUserAgent, }: ServerConfigObj) => void, 
 /** Cache Folder */
 cacheKeys: StringObj, getCacheKeys: () => StringObj, addCacheKey: (customKey: string) => void, removeCacheKey: (customKey: string) => void, 
 /** Validate Folder */

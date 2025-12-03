@@ -13,4 +13,13 @@ interface ListenerSpec<T> {
     task: string;
     fun: (p: T) => any;
 }
-export { ExpressServerFunctions, APIData, ListenerSpec, };
+interface ServerConfig {
+    cacheDir: string;
+    encryptionKey: string;
+    encryptionSalt: string;
+    captchaSecret: string;
+    sanitisationString: string;
+    sanitisationStringExtended: string;
+    overrideUserAgent: string;
+}
+export { ExpressServerFunctions, APIData, ListenerSpec, ServerConfig, };

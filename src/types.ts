@@ -16,8 +16,19 @@ interface ListenerSpec<T> {
     fun: (p: T) => any,
 }
 
+interface ServerConfig {
+    cacheDir: string;
+    encryptionKey: string;
+    encryptionSalt: string;
+    captchaSecret: string;
+    sanitisationString: string;
+    sanitisationStringExtended: string;
+    overrideUserAgent: string;
+}
+
 export {
     ExpressServerFunctions,
     APIData,
     ListenerSpec,
+    ServerConfig,
 }

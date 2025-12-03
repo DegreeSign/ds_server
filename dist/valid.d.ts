@@ -1,22 +1,11 @@
 import fs from "fs";
+import { StringObj } from "@degreesign/utils";
+import { ServerConfig } from "./types";
 declare const 
 /** configurations */
-serverConfig: {
-    cacheDir: string;
-    encryptionKey: string;
-    encryptionSalt: string;
-    captchaSecret: string;
-    /** Sanitise strings check */
-    sanitisationString: string;
-    /** Sanitise strings check (extended) */
-    sanitisationStringExtended: string;
-    /** Override requests user agent */
-    overrideUserAgent: string;
-}, 
+serverConfig: ServerConfig, getServerConfig: () => ServerConfig, setServerConfig: ({ cacheDir, encryptionKey, encryptionSalt, captchaSecret, sanitisationString, sanitisationStringExtended, overrideUserAgent, }: ServerConfig) => void, 
 /** Cache Folder */
-cacheKeys: {
-    exampleKey: string;
-}, 
+cacheKeys: StringObj, getCacheKeys: () => StringObj, addCacheKey: (customKey: string) => void, removeCacheKey: (customKey: string) => void, 
 /** Validate Folder */
 safeFolder: (targetFolder: string) => boolean, 
 /** Delete Folder */
@@ -48,4 +37,4 @@ saveFileLocally: ({ url, filePath }: {
     url: string;
     filePath: string;
 }) => Promise<boolean>;
-export { wrt, wrtJ, red, redJ, safeFolder, delFolder, fileStats, saveCache, readCache, cacheKeys, serverConfig, en, de, hmacValid, cmd, saveFileLocally, };
+export { serverConfig, getServerConfig, setServerConfig, wrt, wrtJ, red, redJ, safeFolder, delFolder, fileStats, saveCache, readCache, cacheKeys, getCacheKeys, addCacheKey, removeCacheKey, en, de, hmacValid, cmd, saveFileLocally, };

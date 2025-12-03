@@ -11,11 +11,12 @@ import {
 } from 'node:crypto';
 import https from 'https'
 import http from 'http'
-import { objLen, seoDt, tN } from "@degreesign/utils"
+import { StringObj, objLen, seoDt, tN } from "@degreesign/utils"
+import { ServerConfig } from "./types";
 
 const
 	/** configurations */
-	serverConfig = {
+	serverConfig: ServerConfig = {
 		cacheDir: `/root/server_cache/cache/`,
 		encryptionKey: ``,
 		encryptionSalt: ``,
@@ -27,9 +28,45 @@ const
 		/** Override requests user agent */
 		overrideUserAgent: ``,
 	},
+	getServerConfig = (): ServerConfig => serverConfig,
+	setServerConfig = ({
+		cacheDir,
+		encryptionKey,
+		encryptionSalt,
+		captchaSecret,
+		sanitisationString,
+		sanitisationStringExtended,
+		overrideUserAgent,
+	}: ServerConfig) => {
+		if (cacheDir != undefined)
+			serverConfig.cacheDir = cacheDir;
+
+		if (encryptionKey != undefined)
+			serverConfig.encryptionKey = encryptionKey;
+
+		if (encryptionSalt != undefined)
+			serverConfig.encryptionSalt = encryptionSalt;
+
+		if (captchaSecret != undefined)
+			serverConfig.captchaSecret = captchaSecret;
+
+		if (sanitisationString != undefined)
+			serverConfig.sanitisationString = sanitisationString;
+
+		if (sanitisationStringExtended != undefined)
+			serverConfig.sanitisationStringExtended = sanitisationStringExtended;
+
+		if (overrideUserAgent != undefined)
+			serverConfig.overrideUserAgent = overrideUserAgent;
+	},
 	/** Cache Folder */
-	cacheKeys = {
-		exampleKey: `exampleKey`,
+	cacheKeys: StringObj = {},
+	getCacheKeys = (): StringObj => cacheKeys,
+	addCacheKey = (customKey: string) => {
+		cacheKeys[customKey] = customKey;
+	},
+	removeCacheKey = (customKey: string) => {
+		delete cacheKeys[customKey];
 	},
 	/** Validate Folder */
 	safeFolder = (targetFolder: string) => {
@@ -240,6 +277,9 @@ const
 	};
 
 export {
+	serverConfig,
+	getServerConfig,
+	setServerConfig,
 	wrt,
 	wrtJ,
 	red,
@@ -250,7 +290,9 @@ export {
 	saveCache,
 	readCache,
 	cacheKeys,
-	serverConfig,
+	getCacheKeys,
+	addCacheKey,
+	removeCacheKey,
 	en,
 	de,
 	hmacValid,

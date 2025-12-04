@@ -9,10 +9,10 @@
   dependencies:
     "@jridgewell/trace-mapping" "0.3.9"
 
-"@degreesign/cache@^0.0.2":
-  version "0.0.2"
-  resolved "https://registry.npmjs.org/@degreesign/cache/-/cache-0.0.2.tgz"
-  integrity sha512-IeS4CWBrY94GV5McC779RRNMF3yTmEMcDy7O7RcvWu3csRjKjLcXCy/9yPLGEd9XCxwVXvOdtHNyFyRrNbQ10Q==
+"@degreesign/cache@^0.0.3":
+  version "0.0.3"
+  resolved "https://registry.npmjs.org/@degreesign/cache/-/cache-0.0.3.tgz"
+  integrity sha512-EZV9B2WGzwxFijLVQjPU/ahgtxD+4UmWPQ1jLMypSp3aKhsmmp2QeeJYV/XNjlCgwt3WBsBsk4qSi0snG8OJBg==
 
 "@degreesign/utils@^1.0.1":
   version "1.0.1"

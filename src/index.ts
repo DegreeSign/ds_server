@@ -8,7 +8,7 @@ import { genAPI, genRandomCodeSize, verAPI, genShortCode } from "./code/codes";
 import { getData, saveFileLocally } from "./code/external";
 import { cmd } from "./code/cmd";
 import { serverConfig, getServerConfig, setServerConfig } from "./code/config";
-import { delFolder, fileStats, readCache, red, redJ, safeFolder, saveCache, wrt, wrtJ } from "@degreesign/cache";
+import { delFile, delFolder, fileStats, readCache, red, redJ, safeFolder, saveCache, wrt, wrtJ } from "@degreesign/cache";
 
 export {
     serverConfig,
@@ -20,6 +20,7 @@ export {
     redJ,
     safeFolder,
     delFolder,
+    delFile,
     fileStats,
     saveCache,
     readCache,

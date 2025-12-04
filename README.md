@@ -8,7 +8,9 @@ DegreeSign Server SDK is a TypeScript library for instant express server setup t
 Install using `yarn add @degreesign/server` or `npm install @degreesign/server` 
 
 ```ts
-  
+    startListener<AccessData>({
+        port: 1234,
+        listenProcessor: listenAPI,
+        listeners: listenArrayAPI,
+    });
 ```
-
-## Development In Progress...

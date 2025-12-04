@@ -1,5 +1,5 @@
 import { delayCode } from "@degreesign/utils";
-import { ff, rf, startListener } from "./code/express";
+import { ff, rf, startListener } from "./code/server";
 import { en, de, hmacValid } from "./code/encrypt";
 import { ServerConfig, APIData, ListenerSpecs, ServerConfigObj } from "./code/types";
 import { chkStg, txtShort, validLen, validLenEq } from "./code/strings";

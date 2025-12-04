@@ -1,6 +1,6 @@
 {
   "name": "@degreesign/server",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "main": "dist/node/degreesign.node.min.js",
   "module": "dist/node/degreesign.node.min.js",
   "browser": "dist/browser/degreesign.min.js",
@@ -42,6 +42,8 @@
     "webpack-dev-server": "^5.2.0"
   },
   "dependencies": {
+    "@degreesign/analytics": "^0.0.7",
+    "@degreesign/cache": "^0.0.2",
     "@degreesign/utils": "^1.0.1",
     "cors": "^2.8.5",
     "express": "^5.1.0",

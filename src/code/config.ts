@@ -1,9 +1,10 @@
+import { getCacheDir, setCacheDir } from "@degreesign/cache";
 import { ServerConfig, ServerConfigObj } from "./types";
 
 const
     /** configurations */
     serverConfig: ServerConfig = {
-        cacheDir: `/root/server_cache/cache/`,
+        cacheDir: getCacheDir(),
         encryptionKey: ``,
         encryptionSalt: ``,
         captchaSecret: ``,
@@ -24,25 +25,27 @@ const
         sanitisationStringExtended,
         overrideUserAgent,
     }: ServerConfigObj) => {
-        if (cacheDir != undefined)
+        if (typeof cacheDir == `string`) {
+            setCacheDir(cacheDir);
             serverConfig.cacheDir = cacheDir;
+        };
 
-        if (encryptionKey != undefined)
+        if (typeof encryptionKey == `string`)
             serverConfig.encryptionKey = encryptionKey;
 
-        if (encryptionSalt != undefined)
+        if (typeof encryptionSalt == `string`)
             serverConfig.encryptionSalt = encryptionSalt;
 
-        if (captchaSecret != undefined)
+        if (typeof captchaSecret == `string`)
             serverConfig.captchaSecret = captchaSecret;
 
-        if (sanitisationString != undefined)
+        if (typeof sanitisationString == `string`)
             serverConfig.sanitisationString = sanitisationString;
 
-        if (sanitisationStringExtended != undefined)
+        if (typeof sanitisationStringExtended == `string`)
             serverConfig.sanitisationStringExtended = sanitisationStringExtended;
 
-        if (overrideUserAgent != undefined)
+        if (typeof overrideUserAgent == `string`)
             serverConfig.overrideUserAgent = overrideUserAgent;
     };
 

@@ -5,11 +5,11 @@ import { ServerConfig, APIData, ListenerSpecs, ServerConfigObj } from "./code/ty
 import { chkStg, txtShort, validLen, validLenEq } from "./code/strings";
 import { capVerify } from "./code/captcha";
 import { genAPI, genRandomCodeSize, verAPI, genShortCode } from "./code/codes";
-import { getData } from "./code/external";
-import { saveCache, readCache } from "./code/cache";
+import { getData, saveFileLocally } from "./code/external";
 import { cmd } from "./code/cmd";
 import { serverConfig, getServerConfig, setServerConfig } from "./code/config";
-import { wrt, wrtJ, red, redJ, safeFolder, delFolder, fileStats, saveFileLocally } from "./code/disk";
+import { ipList, ipRange, ipUpdateIntervals, IPRange, IPList } from "@degreesign/analytics";
+import { delFolder, fileStats, readCache, red, redJ, safeFolder, saveCache, wrt, wrtJ } from "@degreesign/cache";
 
 export {
     serverConfig,
@@ -47,4 +47,9 @@ export {
     startListener,
     APIData,
     ListenerSpecs,
+    ipList,
+    IPList,
+    ipRange,
+    IPRange,
+    ipUpdateIntervals,
 }

@@ -19,7 +19,7 @@ const commonConfig: Configuration = {
             },
         ],
     },
-    plugins: [ // @ts-ignore
+    plugins: [
         new BundleAnalyzerPlugin(),
         new CleanWebpackPlugin(), // Clean output directory before each build
         new webpack.BannerPlugin({
@@ -37,18 +37,6 @@ const commonConfig: Configuration = {
 };
 
 module.exports = [{
-//     // Browser configuration
-//     ...commonConfig,
-//     target: `web`,
-//     output: {
-//         path: path.resolve(__dirname, `dist/browser`), // Separate output directory
-//         filename: `degreesign.min.js`,
-//         library: `dsServer`, // Global variable for browsers
-//         libraryTarget: `umd`, // UMD for browser
-//         globalObject: `this`,
-//     },
-// }, {
-    // Node.js configuration
     ...commonConfig,
     target: `node18`,
     resolve: {

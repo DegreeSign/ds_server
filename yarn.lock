@@ -9,10 +9,10 @@
   dependencies:
     "@jridgewell/trace-mapping" "0.3.9"
 
-"@degreesign/analytics@^0.0.7":
-  version "0.0.7"
-  resolved "https://registry.yarnpkg.com/@degreesign/analytics/-/analytics-0.0.7.tgz#dc2c3080f52bc09fc7b2e3342bc6b760cef77789"
-  integrity sha512-Tcs8cEIsMJ0dshjAzfzGUhSkqnPsVKaH7NJ2MvvJHrauKw4B0x/A7D6aQUe9LQarbFSXcUiO/v9wu1ZkHAm/pQ==
+"@degreesign/analytics@^0.0.9":
+  version "0.0.9"
+  resolved "https://registry.yarnpkg.com/@degreesign/analytics/-/analytics-0.0.9.tgz#a876a77d639c1beca8f8e497939fd8c19c2aa6d0"
+  integrity sha512-IYqHpTSmFEcQl1yD8pDg7HaXKHO+ANV+wGDzWyFLFfyJAqHY2kzHXn10xwzyxwdqoVaDDPacDk80Dh1F0ymlLg==
   dependencies:
     "@degreesign/cache" "^0.0.2"
     "@degreesign/utils" "^1.0.1"

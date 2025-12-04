@@ -8,6 +8,6 @@ import { genAPI, genRandomCodeSize, verAPI, genShortCode } from "./code/codes";
 import { getData, saveFileLocally } from "./code/external";
 import { cmd } from "./code/cmd";
 import { serverConfig, getServerConfig, setServerConfig } from "./code/config";
-import { ipList, ipRange, ipUpdateIntervals, IPRange, IPList } from "@degreesign/analytics";
+import { ipData, ipUpdateIntervals, IPRange, IPList, IPData } from "@degreesign/analytics";
 import { delFolder, fileStats, readCache, red, redJ, safeFolder, saveCache, wrt, wrtJ } from "@degreesign/cache";
-export { serverConfig, getServerConfig, setServerConfig, wrt, wrtJ, red, redJ, safeFolder, delFolder, fileStats, saveCache, readCache, ServerConfig, ServerConfigObj, en, de, hmacValid, cmd, saveFileLocally, ff, rf, chkStg, txtShort, validLen, validLenEq, capVerify, genAPI, genRandomCodeSize, verAPI, genShortCode, getData, delayCode, startListener, APIData, ListenerSpecs, ipList, IPList, ipRange, IPRange, ipUpdateIntervals, };
+export { serverConfig, getServerConfig, setServerConfig, wrt, wrtJ, red, redJ, safeFolder, delFolder, fileStats, saveCache, readCache, ServerConfig, ServerConfigObj, en, de, hmacValid, cmd, saveFileLocally, ff, rf, chkStg, txtShort, validLen, validLenEq, capVerify, genAPI, genRandomCodeSize, verAPI, genShortCode, getData, delayCode, startListener, APIData, ListenerSpecs, ipData, IPData, IPList, IPRange, ipUpdateIntervals, };

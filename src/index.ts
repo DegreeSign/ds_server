@@ -8,7 +8,6 @@ import { genAPI, genRandomCodeSize, verAPI, genShortCode } from "./code/codes";
 import { getData, saveFileLocally } from "./code/external";
 import { cmd } from "./code/cmd";
 import { serverConfig, getServerConfig, setServerConfig } from "./code/config";
-import { ipData, ipUpdateIntervals, IPRange, IPList, IPData } from "@degreesign/analytics";
 import { delFolder, fileStats, readCache, red, redJ, safeFolder, saveCache, wrt, wrtJ } from "@degreesign/cache";
 
 export {
@@ -47,9 +46,4 @@ export {
     startListener,
     APIData,
     ListenerSpecs,
-    ipData,
-    IPData,
-    IPList,
-    IPRange,
-    ipUpdateIntervals,
 }

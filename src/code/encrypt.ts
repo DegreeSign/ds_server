@@ -3,23 +3,27 @@ import {
 	createCipheriv,
 	createDecipheriv,
 	Encoding,
-	CipherKey,
 	BinaryLike
 } from 'node:crypto';
 import { Buffer } from "buffer"
 import { serverConfig } from "./config";
 
+let saltKey: BinaryLike;
+
 const
 	algorithm = `aes-256-cbc`,
 	inputEncoding: Encoding = `utf-8`,
 	outputEncoding: Encoding = `hex`,
-	k: CipherKey = serverConfig.encryptionKey,
-	v: BinaryLike = Buffer.from(serverConfig.encryptionSalt, outputEncoding),
+	salt = (): BinaryLike => {
+		if (!saltKey && serverConfig.encryptionSalt)
+			saltKey = Buffer.from(serverConfig.encryptionSalt, outputEncoding)
+		return saltKey;
+	},
 	/** encrypt data */
 	en = (data?: string): string => {
 		try {
 			if (data) {
-				const e = createCipheriv(algorithm, k, v);
+				const e = createCipheriv(algorithm, serverConfig.encryptionKey, salt());
 				return e.update(data.toString(), inputEncoding, outputEncoding) +
 					e.final(outputEncoding)
 			};
@@ -32,7 +36,7 @@ const
 	de = (dataEN?: string): string => {
 		try {
 			if (dataEN) {
-				const e = createDecipheriv(algorithm, k, v);
+				const e = createDecipheriv(algorithm, serverConfig.encryptionKey, salt());
 				return e.update(dataEN.toString(), outputEncoding, inputEncoding) +
 					e.final(inputEncoding)
 			};

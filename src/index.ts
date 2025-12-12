@@ -1,7 +1,6 @@
-import { delayCode } from "@degreesign/utils";
 import { ff, rf, startListener } from "./code/server";
 import { en, de, hmacValid } from "./code/encrypt";
-import { ServerConfig, APIData, ListenerSpecs, ServerConfigObj } from "./code/types";
+import { ServerConfig, APIData, ListenerSpecs, ServerConfigObj, ProcessInputs } from "./code/types";
 import { chkStg, txtShort, validLen, validLenEq } from "./code/strings";
 import { capVerify } from "./code/captcha";
 import { genAPI, genRandomCodeSize, verAPI, genShortCode } from "./code/codes";
@@ -43,8 +42,8 @@ export {
     verAPI,
     genShortCode,
     getData,
-    delayCode,
     startListener,
     APIData,
     ListenerSpecs,
+    ProcessInputs,
 }

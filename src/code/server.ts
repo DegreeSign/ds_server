@@ -1,73 +1,147 @@
-import express from "express"
-import cors from "cors"
-import { delayCode, seoDt } from "@degreesign/utils"
-import { APIData, ExpressServerFunctions, ListenerSpecs } from "./types"
+import { parse } from "url"
+import { createServer } from "http"
+import { logTime } from "./config";
+import {
+    APIData,
+    ServerFunctions,
+    ListenerSpecs,
+    ServerRouteInputs,
+    ServerRoute,
+    ProcessInputs,
+    ProcessReq
+} from "./types"
 
 const
-    // Server 💻
-    ff = (res: any) => res ? res.status(504).send()
-        : console.log(seoDt(), `error cutting connection`), // cut connection
-    rf = (res: any, data: any, success?: boolean) => res ? res.status(200).send({
-        ...success == undefined ? {
-            success: data?.e == undefined
-        } : { success },
-        ...data,
-    }) : console.log(seoDt(), `error sending data`), // send a message
-    /** Server system (Express) */
-    expressServer = (
+    /** Connection End */
+    ff = (res: any) => {
+        if (res) {
+            res.writeHead(504);
+            res.end();
+        } else console.log(logTime(), `error cutting connection`);
+    },
+    /** Connection Response */
+    rf = (res: any, data: any, success?: boolean) => {
+        if (res) {
+            res.writeHead(200, { 'Content-Type': `application/json` });
+            res.end(JSON.stringify({
+                ...success == undefined ? {
+                    success: data?.e == undefined
+                } : { success },
+                ...data,
+            }));
+        } else console.log(logTime(), `error sending data`);
+    },
+    /** Server system */
+    serverSetup = (
         port: number,
         allowedOrigins?: string[],
-    ): ExpressServerFunctions | undefined => {
+    ): ServerFunctions | undefined => {
         try {
             const
-                app = express(),
+                /** routes endpoints */
+                routes: Map<string, ServerRoute> = new Map(),
                 start = () => {
-                    app.listen(
-                        port,
-                        () => console.log(seoDt(), `Server online`, port)
-                    )
-                },
-                post = (
-                    route: string,
-                    description: string,
-                    process: (
-                        ips: string,
-                        req: any,
-                        res: any,
-                    ) => any
-                ) => {
-                    app.post(`/` + route, (req: any, res: any) => {
+
+                    // create server
+                    const server = createServer(async (req, res) => {
+
                         try {
-                            const ips: string = req.headers[`x-forwarded-for`]
-                                || req.socket.remoteAddress
-                                || req.headers[`cf-connecting-ip`];
-                            process(ips, req, res);
+
+                            // setup response
+                            const origin = req.headers.origin
+                            if (
+                                origin
+                                && (
+                                    !allowedOrigins?.length
+                                    || allowedOrigins.includes(origin)
+                                )
+                            ) {
+                                res.setHeader(`Access-Control-Allow-Origin`, origin)
+                            };
+                            res.setHeader(`Access-Control-Allow-Methods`, `POST`);
+                            res.setHeader(`Access-Control-Allow-Headers`, `Content-Type`);
+
+                            // respond to enquires
+                            if (req.method === "OPTIONS") {
+                                res.writeHead(204);
+                                res.end();
+                                return;
+                            };
+
+                            // read route
+                            const
+                                parsedUrl = parse(req.url || ``, true),
+                                path = parsedUrl.pathname || `/`,
+                                handler = routes.get(path);
+                            if (!handler) {
+                                res.writeHead(404);
+                                res.end();
+                                return
+                            };
+
+                            // verify method
+                            if (req.method !== `POST`) {
+                                res.writeHead(504);
+                                res.end();
+                                return
+                            };
+
+                            try {
+
+                                // read IP
+                                const ips: string = req.headers[`x-forwarded-for`]?.toString()
+                                    || req.socket.remoteAddress
+                                    || req.headers[`cf-connecting-ip`]?.toString()
+                                    || ``;
+
+                                // read body
+                                let body = ``;
+                                for await (const chunk of req)
+                                    body += chunk.toString();
+                                body = body?.trim();
+
+                                // add body
+                                const reqProcess = req as ProcessReq;
+                                reqProcess.body =
+
+                                    // json body
+                                    req.headers[`content-type`]
+                                        ?.toLowerCase()
+                                        ?.includes(`application/json`)
+                                        ? JSON.parse(body)
+
+                                        // others
+                                        : body;
+
+                                // process
+                                handler.process({
+                                    ips,
+                                    req: reqProcess,
+                                    res
+                                });
+
+                            } catch (e) {
+                                console.log(logTime(), `${handler.description} failed, reason:`, e);
+                                ff(res)
+                                return
+                            };
                         } catch (e) {
-                            console.log(seoDt(), description + `, reason: ` + e);
-                            ff(res);
+                            /** Ignore calls that fail setup */
                         };
                     });
-                };
 
-            // Setup 🔧
-            app.use(express.urlencoded({ extended: true }));
-            app.use(express.json());
-            app.use(cors({ methods: `POST` }));
-            app.use((req: any, res: any, next: Function) => {
-                const ori = req.headers.origin;
-                if (
-                    ori
-                    && (
-                        !allowedOrigins?.length
-                        || allowedOrigins.includes(ori)
-                    )
-                ) {
-                    res.setHeader(`Access-Control-Allow-Origin`, ori);
-                };
-
-                // run function
-                next();
-            });
+                    // start server
+                    server.listen(
+                        port,
+                        () => console.log(logTime(), `Server online`, port)
+                    );
+                },
+                post = ({
+                    endPoint,
+                    description,
+                    process,
+                }: ServerRouteInputs) =>
+                    routes.set(`/${endPoint}`, { description, process });
 
             return {
                 /** Listen to Post requests */
@@ -94,18 +168,20 @@ const
     }) => {
         const
             /** Server object */
-            serverObj = expressServer(port, allowedOrigins),
+            serverObj = serverSetup(port, allowedOrigins),
             /** API listener */
             listenAPI = ({
                 endPoint,
                 task,
                 fun
-            }: ListenerSpecs<T>) =>
-                serverObj?.post(endPoint, `REST API ${task} failed`, (
-                    ips: string,
-                    req: any,
-                    res: any,
-                ) => {
+            }: ListenerSpecs<T>) => serverObj?.post({
+                endPoint,
+                description: `REST API ${task} failed`,
+                process: ({
+                    ips,
+                    req,
+                    res,
+                }: ProcessInputs) => {
                     listenProcessor({
                         endPoint,
                         ips,
@@ -113,17 +189,19 @@ const
                         res,
                         fun
                     });
-                });
-        for (let i = 0; i < listeners.length; i++) {
-            const listenerSpecs = listeners[i];
-            listenAPI(listenerSpecs);
-        };
+                }
+            });
+
+        // setup all listeners
+        for (let i = 0; i < listeners.length; i++)
+            listenAPI(listeners[i]);
+
+        // start server
         serverObj?.start();
     };
 
 export {
     ff,
     rf,
-    delayCode,
     startListener,
 }

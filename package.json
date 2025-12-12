@@ -1,17 +1,16 @@
 {
   "name": "@degreesign/server",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "main": "dist/node/degreesign.node.min.js",
   "module": "dist/node/degreesign.node.min.js",
   "browser": "dist/browser/degreesign.min.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "webpack",
-    "postinstall": "npm install express"
+    "build": "webpack"
   },
   "keywords": [
-    "nodejs express server",
-    "nodejs express setup",
+    "nodejs API server",
+    "nodejs API setup",
     "nodejs server setup",
     "degreesign"
   ],
@@ -25,10 +24,8 @@
     "url": "https://github.com/DegreeSign/ds_server/issues"
   },
   "license": "MIT",
-  "description": "DegreeSign Server SDK gives instant express server setup to provide REST API for any project",
+  "description": "DegreeSign Server SDK gives instant API server setup to provide REST API for any project",
   "devDependencies": {
-    "@types/cors": "^2.8.19",
-    "@types/express": "^5.0.6",
     "@types/node": "^22.10.2",
     "@types/speakeasy": "^2.0.10",
     "@types/webpack-bundle-analyzer": "^4.7.0",
@@ -44,10 +41,7 @@
     "webpack-dev-server": "^5.2.0"
   },
   "dependencies": {
-    "@degreesign/cache": "^0.0.3",
-    "@degreesign/utils": "^1.0.1",
-    "cors": "^2.8.5",
-    "express": "^5.2.1",
+    "@degreesign/cache": "^0.0.4",
     "hcaptcha": "^0.2.0",
     "speakeasy": "^2.0.0"
   },

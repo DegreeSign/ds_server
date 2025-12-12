@@ -4,8 +4,7 @@ import {
 } from 'node:fs';
 import https from 'https'
 import http from 'http'
-import { seoDt } from "@degreesign/utils";
-import { serverConfig } from "./config";
+import { logTime, serverConfig } from "./config";
 
 const
     /** fetch data */
@@ -40,8 +39,8 @@ const
 
             return data
         } catch (e) {
-            console.log(seoDt(), `fetching data error`, e);
-            return undefined
+            console.log(logTime(), `fetching data error`, e);
+            return
         }
     },
 

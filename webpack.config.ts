@@ -46,9 +46,6 @@ module.exports = [{
         aliasFields: [],
         preferRelative: true,
     },
-    externals: {
-        express: "commonjs express",
-    },
     output: {
         path: path.resolve(__dirname, `dist/node`), // Separate output directory
         filename: `degreesign.node.min.js`,

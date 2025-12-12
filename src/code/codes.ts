@@ -1,5 +1,5 @@
 import speakeasy from "speakeasy"
-import { seoDt } from "@degreesign/utils";
+import { logTime } from "./config";
 
 const
     /** Generate API Code */
@@ -20,7 +20,7 @@ const
                     token: t
                 });
         } catch (e) {
-            console.log(seoDt(), `Verifying auth code failed`, e);
+            console.log(logTime(), `Verifying auth code failed`, e);
             return undefined
         };
     };

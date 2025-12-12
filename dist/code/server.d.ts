@@ -1,7 +1,9 @@
-import { delayCode } from "@degreesign/utils";
 import { APIData, ListenerSpecs } from "./types";
-declare const ff: (res: any) => any, // cut connection
-rf: (res: any, data: any, success?: boolean) => any, 
+declare const 
+/** Connection End */
+ff: (res: any) => void, 
+/** Connection Response */
+rf: (res: any, data: any, success?: boolean) => void, 
 /** Start Listener */
 startListener: <T>({ port, allowedOrigins, listenProcessor, listeners, }: {
     port: number;
@@ -9,4 +11,4 @@ startListener: <T>({ port, allowedOrigins, listenProcessor, listeners, }: {
     listenProcessor: (p: APIData<T>) => any;
     listeners: ListenerSpecs<T>[];
 }) => void;
-export { ff, rf, delayCode, startListener, };
+export { ff, rf, startListener, };

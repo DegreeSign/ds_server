@@ -2,6 +2,7 @@ import { getCacheDir, setCacheDir } from "@degreesign/cache";
 import { ServerConfig, ServerConfigObj } from "./types";
 
 const
+    logTime = () => new Date().toUTCString(),
     /** configurations */
     serverConfig: ServerConfig = {
         cacheDir: getCacheDir(),
@@ -50,6 +51,7 @@ const
     };
 
 export {
+    logTime,
     serverConfig,
     getServerConfig,
     setServerConfig,

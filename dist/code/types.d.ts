@@ -1,12 +1,25 @@
-interface ExpressServerFunctions {
-    post: (route: string, description: string, process: (ips: string, req: any, res: any) => any) => void;
+import { IncomingMessage, ServerResponse } from "http";
+interface ProcessReq extends IncomingMessage {
+    body: any;
+}
+interface ProcessInputs {
+    ips: string;
+    req: ProcessReq;
+    res: ServerResponse<IncomingMessage>;
+}
+interface ServerRoute {
+    description: string;
+    process: (params: ProcessInputs) => any;
+}
+interface ServerRouteInputs extends ServerRoute {
+    endPoint: string;
+}
+interface ServerFunctions {
+    post: (params: ServerRouteInputs) => void;
     start: () => void;
 }
-interface APIData<T> {
+interface APIData<T> extends ProcessInputs {
     endPoint: string;
-    ips: string;
-    req: any;
-    res: any;
     fun: (p: T) => any;
 }
 interface ListenerSpecs<T> {
@@ -32,4 +45,4 @@ interface ServerConfigObj {
     sanitisationStringExtended?: string;
     overrideUserAgent?: string;
 }
-export { ExpressServerFunctions, APIData, ListenerSpecs, ServerConfig, ServerConfigObj, };
+export { ProcessReq, ProcessInputs, ServerRoute, ServerRouteInputs, ServerFunctions, APIData, ListenerSpecs, ServerConfig, ServerConfigObj, };

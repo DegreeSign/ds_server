@@ -5,7 +5,6 @@ import {
 	Encoding,
 	BinaryLike
 } from 'node:crypto';
-import { Buffer } from "buffer"
 import { serverConfig } from "./config";
 
 let saltKey: BinaryLike;

@@ -61,11 +61,11 @@ const
                             res.setHeader(`Access-Control-Allow-Methods`, `POST`);
                             res.setHeader(`Access-Control-Allow-Headers`, `Content-Type`);
 
-                            // respond to enquires
-                            if (req.method === "OPTIONS") {
+                            // verify method
+                            if (req.method !== `POST`) {
                                 res.writeHead(204);
                                 res.end();
-                                return;
+                                return
                             };
 
                             // read route
@@ -75,13 +75,6 @@ const
                                 handler = routes.get(path);
                             if (!handler) {
                                 res.writeHead(404);
-                                res.end();
-                                return
-                            };
-
-                            // verify method
-                            if (req.method !== `POST`) {
-                                res.writeHead(504);
                                 res.end();
                                 return
                             };

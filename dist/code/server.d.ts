@@ -1,9 +1,10 @@
+import { IncomingMessage, ServerResponse } from "http";
 import { APIData, ListenerSpecs } from "./types";
 declare const 
 /** Connection End */
-ff: (res: any) => void, 
+ff: (res: ServerResponse<IncomingMessage>) => void, 
 /** Connection Response */
-rf: (res: any, data: any, success?: boolean) => void, 
+rf: (res: ServerResponse<IncomingMessage>, data: any, success?: boolean) => void, 
 /** Start Listener */
 startListener: <T>({ port, allowedOrigins, listenProcessor, listeners, }: {
     port: number;

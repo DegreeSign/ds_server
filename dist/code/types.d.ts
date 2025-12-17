@@ -8,8 +8,13 @@ interface ProcessInputs {
     res: ServerResponse<IncomingMessage>;
 }
 interface ServerRoute {
+    /** Route Description */
     description: string;
+    /** Route Process */
     process: (params: ProcessInputs) => any;
+}
+interface ServerRouteObj {
+    [endPoint: string]: ServerRoute;
 }
 interface ServerRouteInputs extends ServerRoute {
     endPoint: string;
@@ -45,4 +50,4 @@ interface ServerConfigObj {
     sanitisationStringExtended?: string;
     overrideUserAgent?: string;
 }
-export { ProcessReq, ProcessInputs, ServerRoute, ServerRouteInputs, ServerFunctions, APIData, ListenerSpecs, ServerConfig, ServerConfigObj, };
+export { ProcessReq, ProcessInputs, ServerRoute, ServerRouteObj, ServerRouteInputs, ServerFunctions, APIData, ListenerSpecs, ServerConfig, ServerConfigObj, };

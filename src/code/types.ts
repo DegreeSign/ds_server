@@ -11,8 +11,14 @@ interface ProcessInputs {
 }
 
 interface ServerRoute {
+    /** Route Description */
     description: string,
+    /** Route Process */
     process: (params: ProcessInputs) => any
+}
+
+interface ServerRouteObj {
+    [endPoint: string]: ServerRoute
 }
 
 interface ServerRouteInputs extends ServerRoute {
@@ -59,6 +65,7 @@ export {
     ProcessReq,
     ProcessInputs,
     ServerRoute,
+    ServerRouteObj,
     ServerRouteInputs,
     ServerFunctions,
     APIData,

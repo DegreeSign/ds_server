@@ -1,35 +1,62 @@
-import { parse } from "url"
-import { createServer } from "http"
+import {
+    IncomingMessage,
+    OutgoingHttpHeaders,
+    ServerResponse,
+    createServer
+} from "http"
 import { logTime } from "./config";
 import {
     APIData,
     ServerFunctions,
     ListenerSpecs,
     ServerRouteInputs,
-    ServerRoute,
+    ServerRouteObj,
     ProcessInputs,
     ProcessReq
 } from "./types"
 
 const
+    homePath = `/`,
+    baseFallbackURL = `http://localhost/`,
+    POST = `POST`,
+    headerStr = `Access-Control-Allow-`,
+    originHeader = `${headerStr}Origin`,
+    Content_Type = `Content-Type`,
+    application_json = `application/json`,
+    x_forwarded_for = `x-forwarded-for`,
+    cf_connecting_ip = `cf-connecting-ip`,
+    content_type = `content-type`,
+    standardHeaders = new Headers({
+        [`${headerStr}Methods`]: POST,
+        [`${headerStr}Headers`]: Content_Type
+    }),
+    acceptedHeader: OutgoingHttpHeaders = {
+        [Content_Type]: application_json
+    },
     /** Connection End */
-    ff = (res: any) => {
-        if (res) {
+    ff = (res: ServerResponse<IncomingMessage>) => {
+        if (!res) return
+        try {
             res.writeHead(504);
             res.end();
-        } else console.log(logTime(), `error cutting connection`);
+        } catch (e) { };
     },
     /** Connection Response */
-    rf = (res: any, data: any, success?: boolean) => {
-        if (res) {
-            res.writeHead(200, { 'Content-Type': `application/json` });
+    rf = (
+        res: ServerResponse<IncomingMessage>,
+        data: any,
+        success?: boolean
+    ) => {
+        if (!res) return
+        try {
+            res.writeHead(200, acceptedHeader);
             res.end(JSON.stringify({
                 ...success == undefined ? {
                     success: data?.e == undefined
                 } : { success },
                 ...data,
             }));
-        } else console.log(logTime(), `error sending data`);
+        } catch (e) { ff(res); };
     },
     /** Server system */
     serverSetup = (
@@ -39,7 +66,7 @@ const
         try {
             const
                 /** routes endpoints */
-                routes: Map<string, ServerRoute> = new Map(),
+                routes: ServerRouteObj = {},
                 start = () => {
 
                     // create server
@@ -56,13 +83,12 @@ const
                                     || allowedOrigins.includes(origin)
                                 )
                             ) {
-                                res.setHeader(`Access-Control-Allow-Origin`, origin)
+                                res.setHeader(originHeader, origin)
                             };
-                            res.setHeader(`Access-Control-Allow-Methods`, `POST`);
-                            res.setHeader(`Access-Control-Allow-Headers`, `Content-Type`);
+                            res.setHeaders(standardHeaders);
 
                             // verify method
-                            if (req.method !== `POST`) {
+                            if (req.method !== POST) {
                                 res.writeHead(204);
                                 res.end();
                                 return
@@ -70,9 +96,9 @@ const
 
                             // read route
                             const
-                                parsedUrl = parse(req.url || ``, true),
-                                path = parsedUrl.pathname || `/`,
-                                handler = routes.get(path);
+                                parsedUrl = new URL(req.url || homePath, baseFallbackURL),
+                                path = (parsedUrl?.pathname || homePath)?.toLowerCase(),
+                                handler = routes[path];
                             if (!handler) {
                                 res.writeHead(404);
                                 res.end();
@@ -82,9 +108,9 @@ const
                             try {
 
                                 // read IP
-                                const ips: string = req.headers[`x-forwarded-for`]?.toString()
+                                const ips: string = req.headers[x_forwarded_for]?.toString()
                                     || req.socket.remoteAddress
-                                    || req.headers[`cf-connecting-ip`]?.toString()
+                                    || req.headers[cf_connecting_ip]?.toString()
                                     || ``;
 
                                 // read body
@@ -98,9 +124,9 @@ const
                                 reqProcess.body =
 
                                     // json body
-                                    req.headers[`content-type`]
+                                    req.headers[content_type]
                                         ?.toLowerCase()
-                                        ?.includes(`application/json`)
+                                        ?.includes(application_json)
                                         ? JSON.parse(body)
 
                                         // others
@@ -126,15 +152,17 @@ const
                     // start server
                     server.listen(
                         port,
-                        () => console.log(logTime(), `Server online`, port)
+                        () => console.log(logTime(), `Server Online`, port)
                     );
                 },
                 post = ({
                     endPoint,
                     description,
                     process,
-                }: ServerRouteInputs) =>
-                    routes.set(`/${endPoint}`, { description, process });
+                }: ServerRouteInputs) => {
+                    if (endPoint === homePath || !endPoint) endPoint = ``;
+                    routes[`/${endPoint}`?.toLowerCase()] = { description, process };
+                };
 
             return {
                 /** Listen to Post requests */

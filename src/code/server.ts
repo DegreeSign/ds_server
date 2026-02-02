@@ -89,6 +89,14 @@ const
                             };
                             res.setHeaders(standardHeaders);
 
+                            // respond to OPTIONS
+                            const isPOST = req.method == POST;
+                            if (!isPOST && req.method != GET) {
+                                res.writeHead(204);
+                                res.end();
+                                return
+                            };
+
                             // read route
                             const
                                 parsedUrl = new URL(req.url || homePath, baseFallbackURL),
@@ -116,7 +124,7 @@ const
                                     // req type
                                     reqProcess = req as ProcessReq;
 
-                                if (req.method == POST) {
+                                if (isPOST) {
                                     // read body
                                     let body = ``;
                                     for await (const chunk of req)

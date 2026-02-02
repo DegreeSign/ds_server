@@ -1,7 +1,7 @@
 import { IncomingMessage, ServerResponse } from "http";
 
 interface ProcessReq extends IncomingMessage {
-    body: any
+    body: any;
 }
 
 interface ProcessInputs {
@@ -10,23 +10,30 @@ interface ProcessInputs {
     res: ServerResponse<IncomingMessage>;
 }
 
+type ServerMethods = `GET` | `POST`;
+
 interface ServerRoute {
+    /** Route Method */
+    method: ServerMethods;
     /** Route Description */
-    description: string,
+    description: string;
     /** Route Process */
-    process: (params: ProcessInputs) => any
+    process: (params: ProcessInputs) => any;
 }
 
 interface ServerRouteObj {
-    [endPoint: string]: ServerRoute
+    [endPoint: string]: ServerRoute;
 }
 
 interface ServerRouteInputs extends ServerRoute {
-    endPoint: string,
+    /** Route Endpoint */
+    endPoint: string;
 }
 
 interface ServerFunctions {
-    post: (params: ServerRouteInputs) => void;
+    /** Server Method Processor */
+    processor: (params: ServerRouteInputs) => void;
+    /** Server Start */
     start: () => void;
 }
 
@@ -36,9 +43,14 @@ interface APIData<T> extends ProcessInputs {
 }
 
 interface ListenerSpecs<T> {
-    endPoint: string,
-    task: string,
-    fun: (p: T) => any,
+    /** Route Method */
+    method?: ServerMethods;
+    /** Route Endpoint */
+    endPoint: string;
+    /** Route Description */
+    task: string;
+    /** Route Processing Function */
+    fun: (p: T) => any;
 }
 
 interface ServerConfig {
@@ -64,6 +76,7 @@ interface ServerConfigObj {
 export {
     ProcessReq,
     ProcessInputs,
+    ServerMethods,
     ServerRoute,
     ServerRouteObj,
     ServerRouteInputs,

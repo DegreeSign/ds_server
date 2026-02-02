@@ -12,13 +12,15 @@ import {
     ServerRouteInputs,
     ServerRouteObj,
     ProcessInputs,
-    ProcessReq
+    ProcessReq,
+    ServerMethods
 } from "./types"
 
 const
     homePath = `/`,
     baseFallbackURL = `http://localhost/`,
-    POST = `POST`,
+    GET: ServerMethods = `GET`,
+    POST: ServerMethods = `POST`,
     headerStr = `Access-Control-Allow-`,
     originHeader = `${headerStr}Origin`,
     Content_Type = `Content-Type`,
@@ -87,19 +89,16 @@ const
                             };
                             res.setHeaders(standardHeaders);
 
-                            // verify method
-                            if (req.method !== POST) {
-                                res.writeHead(204);
-                                res.end();
-                                return
-                            };
-
                             // read route
                             const
                                 parsedUrl = new URL(req.url || homePath, baseFallbackURL),
                                 path = (parsedUrl?.pathname || homePath)?.toLowerCase(),
                                 handler = routes[path];
-                            if (!handler) {
+
+                            if (
+                                !handler // verify route
+                                || req.method != handler.method // verify method
+                            ) {
                                 res.writeHead(404);
                                 res.end();
                                 return
@@ -107,30 +106,39 @@ const
 
                             try {
 
-                                // read IP
-                                const ips: string = req.headers[x_forwarded_for]?.toString()
-                                    || req.socket.remoteAddress
-                                    || req.headers[cf_connecting_ip]?.toString()
-                                    || ``;
+                                const
+                                    // read IP
+                                    ips: string = req.headers[x_forwarded_for]?.toString()
+                                        || req.socket.remoteAddress
+                                        || req.headers[cf_connecting_ip]?.toString()
+                                        || ``,
 
-                                // read body
-                                let body = ``;
-                                for await (const chunk of req)
-                                    body += chunk.toString();
-                                body = body?.trim();
+                                    // req type
+                                    reqProcess = req as ProcessReq;
 
-                                // add body
-                                const reqProcess = req as ProcessReq;
-                                reqProcess.body =
+                                if (req.method == POST) {
+                                    // read body
+                                    let body = ``;
+                                    for await (const chunk of req)
+                                        body += chunk.toString();
+                                    body = body?.trim();
 
-                                    // json body
-                                    req.headers[content_type]
-                                        ?.toLowerCase()
-                                        ?.includes(application_json)
-                                        ? JSON.parse(body)
+                                    // add body
+                                    reqProcess.body =
 
-                                        // others
-                                        : body;
+                                        // json body
+                                        req.headers[content_type]
+                                            ?.toLowerCase()
+                                            ?.includes(application_json)
+                                            ? JSON.parse(body)
+
+                                            // others
+                                            : body;
+                                } else {
+                                    // query parameters
+                                    reqProcess.body =
+                                        Object.fromEntries(parsedUrl.searchParams);
+                                };
 
                                 // process
                                 handler.process({
@@ -155,18 +163,19 @@ const
                         () => console.log(logTime(), `Server Online`, port)
                     );
                 },
-                post = ({
+                processor = ({
+                    method,
                     endPoint,
                     description,
                     process,
                 }: ServerRouteInputs) => {
-                    if (endPoint === homePath || !endPoint) endPoint = ``;
-                    routes[`/${endPoint}`?.toLowerCase()] = { description, process };
+                    if (endPoint == homePath || !endPoint) endPoint = ``;
+                    routes[`/${endPoint}`?.toLowerCase()] = { method, description, process };
                 };
 
             return {
-                /** Listen to Post requests */
-                post,
+                /** Listen to requests */
+                processor,
                 /** Go live 📶 */
                 start
             };
@@ -192,10 +201,12 @@ const
             serverObj = serverSetup(port, allowedOrigins),
             /** API listener */
             listenAPI = ({
+                method = POST,
                 endPoint,
                 task,
                 fun
-            }: ListenerSpecs<T>) => serverObj?.post({
+            }: ListenerSpecs<T>) => serverObj?.processor({
+                method,
                 endPoint,
                 description: `REST API ${task} failed`,
                 process: ({

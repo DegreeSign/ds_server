@@ -32,6 +32,7 @@ const
         fun({ ips, req, res, body: req.body });
     },
     listeners: ListenerSpecs<AccessData>[] = [{
+        method: `POST`,
         endPoint: `test`,
         task: `testing API`,
         fun: (p) => {

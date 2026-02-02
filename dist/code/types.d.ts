@@ -7,7 +7,10 @@ interface ProcessInputs {
     req: ProcessReq;
     res: ServerResponse<IncomingMessage>;
 }
+type ServerMethods = `GET` | `POST`;
 interface ServerRoute {
+    /** Route Method */
+    method: ServerMethods;
     /** Route Description */
     description: string;
     /** Route Process */
@@ -17,10 +20,13 @@ interface ServerRouteObj {
     [endPoint: string]: ServerRoute;
 }
 interface ServerRouteInputs extends ServerRoute {
+    /** Route Endpoint */
     endPoint: string;
 }
 interface ServerFunctions {
-    post: (params: ServerRouteInputs) => void;
+    /** Server Method Processor */
+    processor: (params: ServerRouteInputs) => void;
+    /** Server Start */
     start: () => void;
 }
 interface APIData<T> extends ProcessInputs {
@@ -28,8 +34,13 @@ interface APIData<T> extends ProcessInputs {
     fun: (p: T) => any;
 }
 interface ListenerSpecs<T> {
+    /** Route Method */
+    method?: ServerMethods;
+    /** Route Endpoint */
     endPoint: string;
+    /** Route Description */
     task: string;
+    /** Route Processing Function */
     fun: (p: T) => any;
 }
 interface ServerConfig {
@@ -50,4 +61,4 @@ interface ServerConfigObj {
     sanitisationStringExtended?: string;
     overrideUserAgent?: string;
 }
-export { ProcessReq, ProcessInputs, ServerRoute, ServerRouteObj, ServerRouteInputs, ServerFunctions, APIData, ListenerSpecs, ServerConfig, ServerConfigObj, };
+export { ProcessReq, ProcessInputs, ServerMethods, ServerRoute, ServerRouteObj, ServerRouteInputs, ServerFunctions, APIData, ListenerSpecs, ServerConfig, ServerConfigObj, };

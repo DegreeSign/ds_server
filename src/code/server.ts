@@ -4,7 +4,7 @@ import {
     ServerResponse,
     createServer
 } from "http"
-import { logTime } from "./config";
+import { logTime, serverConfig } from "./config";
 import {
     APIData,
     ServerFunctions,
@@ -18,7 +18,6 @@ import {
 
 const
     homePath = `/`,
-    baseFallbackURL = `http://localhost/`,
     GET: ServerMethods = `GET`,
     POST: ServerMethods = `POST`,
     headerStr = `Access-Control-Allow-`,
@@ -28,13 +27,16 @@ const
     x_forwarded_for = `x-forwarded-for`,
     cf_connecting_ip = `cf-connecting-ip`,
     content_type = `content-type`,
-    standardHeaders = new Headers({
-        [`${headerStr}Methods`]: POST,
-        [`${headerStr}Headers`]: Content_Type
-    }),
+    content_length = `content-length`,
+    allowMethodsHeader = `${headerStr}Methods`,
+    allowMethodsValue = `${GET}, ${POST}`,
+    allowHeadersHeader = `${headerStr}Headers`,
     acceptedHeader: OutgoingHttpHeaders = {
         [Content_Type]: application_json
     },
+    payloadTooLargeResponse = JSON.stringify({ success: false, error: `payload too large` }),
+    invalidJsonResponse = JSON.stringify({ success: false, error: `invalid json` }),
+    FAILED_REASON = `failed, reason:`,
     /** Connection End */
     ff = (res: ServerResponse<IncomingMessage>) => {
         if (!res) return
@@ -52,12 +54,9 @@ const
         if (!res) return
         try {
             res.writeHead(200, acceptedHeader);
-            res.end(JSON.stringify({
-                ...success == undefined ? {
-                    success: data?.e == undefined
-                } : { success },
-                ...data,
-            }));
+            const successState =
+                success === undefined ? data?.e == undefined : success;
+            res.end(JSON.stringify({ success: successState, ...data }));
         } catch (e) { ff(res); };
     },
     /** Server system */
@@ -69,6 +68,7 @@ const
             const
                 /** routes endpoints */
                 routes: ServerRouteObj = {},
+                maxBodySize = serverConfig.maxBodySizeMB * 1024 * 1024,
                 start = () => {
 
                     // create server
@@ -87,7 +87,8 @@ const
                             ) {
                                 res.setHeader(originHeader, origin)
                             };
-                            res.setHeaders(standardHeaders);
+                            res.setHeader(allowMethodsHeader, allowMethodsValue);
+                            res.setHeader(allowHeadersHeader, Content_Type);
 
                             // respond to OPTIONS
                             const isPOST = req.method == POST;
@@ -99,9 +100,15 @@ const
 
                             // read route
                             const
-                                parsedUrl = new URL(req.url || homePath, baseFallbackURL),
-                                path = (parsedUrl?.pathname || homePath)?.toLowerCase(),
-                                handler = routes[path];
+                                rawUrl = req.url || homePath,
+                                queryIdx = rawUrl.indexOf(`?`),
+                                rawPath = queryIdx == -1 ? rawUrl
+                                    : (
+                                        rawUrl.slice(0, queryIdx)
+                                        || homePath
+                                    );
+                            let handler = routes[rawPath];
+                            if (!handler) handler = routes[rawPath.toLowerCase()];
 
                             if (
                                 !handler // verify route
@@ -125,27 +132,57 @@ const
                                     reqProcess = req as ProcessReq;
 
                                 if (isPOST) {
+                                    // reject oversized payloads up front
+                                    if (
+                                        Number(req.headers[content_length])
+                                        > maxBodySize
+                                    ) {
+                                        res.writeHead(413, acceptedHeader);
+                                        res.end(payloadTooLargeResponse);
+                                        return
+                                    };
+
                                     // read body
                                     let body = ``;
-                                    for await (const chunk of req)
-                                        body += chunk.toString();
-                                    body = body?.trim();
+                                    let size = 0;
+                                    const chunks: Buffer[] = [];
+                                    for await (const chunk of req) {
+                                        size += chunk.length;
+                                        if (size > maxBodySize) {
+                                            res.writeHead(413, acceptedHeader);
+                                            res.end(payloadTooLargeResponse);
+                                            req.destroy();
+                                            return
+                                        };
+                                        chunks.push(chunk);
+                                    };
+                                    body = Buffer.concat(chunks).toString()?.trim();
 
                                     // add body
-                                    reqProcess.body =
-
-                                        // json body
+                                    if (
                                         req.headers[content_type]
                                             ?.toLowerCase()
                                             ?.includes(application_json)
-                                            ? JSON.parse(body)
-
-                                            // others
-                                            : body;
+                                    ) {
+                                        // json body
+                                        try {
+                                            reqProcess.body = JSON.parse(body);
+                                        } catch {
+                                            res.writeHead(400, acceptedHeader);
+                                            res.end(invalidJsonResponse);
+                                            return
+                                        };
+                                    } else {
+                                        // others
+                                        reqProcess.body = body;
+                                    };
                                 } else {
                                     // query parameters
-                                    reqProcess.body =
-                                        Object.fromEntries(parsedUrl.searchParams);
+                                    reqProcess.body = Object.fromEntries(
+                                        queryIdx == -1
+                                            ? new URLSearchParams()
+                                            : new URLSearchParams(rawUrl.slice(queryIdx + 1))
+                                    );
                                 };
 
                                 // process
@@ -156,7 +193,7 @@ const
                                 });
 
                             } catch (e) {
-                                console.log(logTime(), `${handler.description} failed, reason:`, e);
+                                console.log(logTime(), handler.description, FAILED_REASON, e);
                                 ff(res)
                                 return
                             };
@@ -164,6 +201,12 @@ const
                             /** Ignore calls that fail setup */
                         };
                     });
+
+                    // harden against slow-body / slowloris
+                    server.requestTimeout = serverConfig.requestTimeoutMs;
+                    server.headersTimeout = serverConfig.headersTimeoutMs;
+                    server.keepAliveTimeout = serverConfig.keepAliveTimeoutMs;
+                    server.maxRequestsPerSocket = serverConfig.maxRequestsPerSocket;
 
                     // start server
                     server.listen(

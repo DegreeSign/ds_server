@@ -54,23 +54,30 @@ interface ListenerSpecs<T> {
 }
 
 interface ServerConfig {
+    /** Cache directory path */
     cacheDir: string;
+    /** Encryption key */
     encryptionKey: string;
+    /** Encryption salt */
     encryptionSalt: string;
+    /** hCaptcha secret key */
     captchaSecret: string;
+    /** Sanitise strings check */
     sanitisationString: string;
+    /** Sanitise strings check (extended) */
     sanitisationStringExtended: string;
+    /** Override requests user agent */
     overrideUserAgent: string;
-}
-
-interface ServerConfigObj {
-    cacheDir?: string;
-    encryptionKey?: string;
-    encryptionSalt?: string;
-    captchaSecret?: string;
-    sanitisationString?: string;
-    sanitisationStringExtended?: string;
-    overrideUserAgent?: string;
+    /** Max request body size in MB */
+    maxBodySizeMB: number;
+    /** Max time to receive request body (slow-body) in ms */
+    requestTimeoutMs: number;
+    /** Max time to receive request headers (slowloris) in ms */
+    headersTimeoutMs: number;
+    /** Keep-alive idle timeout in ms */
+    keepAliveTimeoutMs: number;
+    /** Max requests per keep-alive socket (0 = unlimited) */
+    maxRequestsPerSocket: number;
 }
 
 export {
@@ -84,5 +91,4 @@ export {
     APIData,
     ListenerSpecs,
     ServerConfig,
-    ServerConfigObj,
 }

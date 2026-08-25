@@ -1,5 +1,5 @@
 import { getCacheDir, setCacheDir } from "@degreesign/cache";
-import { ServerConfig, ServerConfigObj } from "./types";
+import { ServerConfig } from "./types";
 
 const
     logTime = () => new Date().toUTCString(),
@@ -9,12 +9,14 @@ const
         encryptionKey: ``,
         encryptionSalt: ``,
         captchaSecret: ``,
-        /** Sanitise strings check */
         sanitisationString: ``,
-        /** Sanitise strings check (extended) */
         sanitisationStringExtended: ``,
-        /** Override requests user agent */
         overrideUserAgent: ``,
+        maxBodySizeMB: 10,
+        requestTimeoutMs: 30000,
+        headersTimeoutMs: 60000,
+        keepAliveTimeoutMs: 5000,
+        maxRequestsPerSocket: 0,
     },
     getServerConfig = (): ServerConfig => serverConfig,
     setServerConfig = ({
@@ -25,7 +27,12 @@ const
         sanitisationString,
         sanitisationStringExtended,
         overrideUserAgent,
-    }: ServerConfigObj) => {
+        maxBodySizeMB,
+        requestTimeoutMs,
+        headersTimeoutMs,
+        keepAliveTimeoutMs,
+        maxRequestsPerSocket,
+    }: Partial<ServerConfig>) => {
         if (typeof cacheDir == `string`) {
             setCacheDir(cacheDir);
             serverConfig.cacheDir = cacheDir;
@@ -48,6 +55,21 @@ const
 
         if (typeof overrideUserAgent == `string`)
             serverConfig.overrideUserAgent = overrideUserAgent;
+
+        if (typeof maxBodySizeMB == `number` && maxBodySizeMB > 0)
+            serverConfig.maxBodySizeMB = maxBodySizeMB;
+
+        if (typeof requestTimeoutMs == `number` && requestTimeoutMs > 0)
+            serverConfig.requestTimeoutMs = requestTimeoutMs;
+
+        if (typeof headersTimeoutMs == `number` && headersTimeoutMs > 0)
+            serverConfig.headersTimeoutMs = headersTimeoutMs;
+
+        if (typeof keepAliveTimeoutMs == `number` && keepAliveTimeoutMs > 0)
+            serverConfig.keepAliveTimeoutMs = keepAliveTimeoutMs;
+
+        if (typeof maxRequestsPerSocket == `number` && maxRequestsPerSocket >= 0)
+            serverConfig.maxRequestsPerSocket = maxRequestsPerSocket;
     };
 
 export {

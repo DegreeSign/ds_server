@@ -1,6 +1,5 @@
 import {
     IncomingMessage,
-    OutgoingHttpHeaders,
     ServerResponse,
     createServer
 } from "http"
@@ -12,36 +11,42 @@ import {
     ServerRouteInputs,
     ServerRouteObj,
     ProcessInputs,
-    ProcessReq,
-    ServerMethods
+    ProcessReq
 } from "./types"
+import {
+    HOME_PATH,
+    QUERY_CHAR,
+    GET,
+    POST,
+    ORIGIN_HEADER,
+    CONTENT_TYPE,
+    APPLICATION_JSON,
+    X_FORWARDED_FOR,
+    CF_CONNECTING_IP,
+    CONTENT_TYPE_LOWERCASE,
+    CONTENT_LENGTH,
+    ALLOW_METHODS_HEADER,
+    ALLOW_METHODS_VALUE,
+    ALLOW_HEADERS_HEADER,
+    ACCEPTED_HEADER,
+    PAYLOAD_TOO_LARGE_RESPONSE,
+    INVALID_JSON_RESPONSE,
+    FAILED_REASON,
+    SERVER_ONLINE_MESSAGE,
+    STATUS_OK,
+    STATUS_NO_CONTENT,
+    STATUS_NOT_FOUND,
+    STATUS_PAYLOAD_TOO_LARGE,
+    STATUS_BAD_REQUEST,
+    STATUS_GATEWAY_TIMEOUT,
+} from "./constants"
 
 const
-    homePath = `/`,
-    GET: ServerMethods = `GET`,
-    POST: ServerMethods = `POST`,
-    headerStr = `Access-Control-Allow-`,
-    originHeader = `${headerStr}Origin`,
-    Content_Type = `Content-Type`,
-    application_json = `application/json`,
-    x_forwarded_for = `x-forwarded-for`,
-    cf_connecting_ip = `cf-connecting-ip`,
-    content_type = `content-type`,
-    content_length = `content-length`,
-    allowMethodsHeader = `${headerStr}Methods`,
-    allowMethodsValue = `${GET}, ${POST}`,
-    allowHeadersHeader = `${headerStr}Headers`,
-    acceptedHeader: OutgoingHttpHeaders = {
-        [Content_Type]: application_json
-    },
-    payloadTooLargeResponse = JSON.stringify({ success: false, error: `payload too large` }),
-    invalidJsonResponse = JSON.stringify({ success: false, error: `invalid json` }),
-    FAILED_REASON = `failed, reason:`,
     /** Connection End */
     ff = (res: ServerResponse<IncomingMessage>) => {
         if (!res) return
         try {
-            res.writeHead(504);
+            res.writeHead(STATUS_GATEWAY_TIMEOUT);
             res.end();
         } catch (e) { };
     },
@@ -53,7 +58,7 @@ const
     ) => {
         if (!res) return
         try {
-            res.writeHead(200, acceptedHeader);
+            res.writeHead(STATUS_OK, ACCEPTED_HEADER);
             const successState =
                 success === undefined ? data?.e == undefined : success;
             res.end(JSON.stringify({ success: successState, ...data }));
@@ -85,27 +90,27 @@ const
                                     || allowedOrigins.includes(origin)
                                 )
                             ) {
-                                res.setHeader(originHeader, origin)
+                                res.setHeader(ORIGIN_HEADER, origin)
                             };
-                            res.setHeader(allowMethodsHeader, allowMethodsValue);
-                            res.setHeader(allowHeadersHeader, Content_Type);
+                            res.setHeader(ALLOW_METHODS_HEADER, ALLOW_METHODS_VALUE);
+                            res.setHeader(ALLOW_HEADERS_HEADER, CONTENT_TYPE);
 
                             // respond to OPTIONS
                             const isPOST = req.method == POST;
                             if (!isPOST && req.method != GET) {
-                                res.writeHead(204);
+                                res.writeHead(STATUS_NO_CONTENT);
                                 res.end();
                                 return
                             };
 
                             // read route
                             const
-                                rawUrl = req.url || homePath,
-                                queryIdx = rawUrl.indexOf(`?`),
+                                rawUrl = req.url || HOME_PATH,
+                                queryIdx = rawUrl.indexOf(QUERY_CHAR),
                                 rawPath = queryIdx == -1 ? rawUrl
                                     : (
                                         rawUrl.slice(0, queryIdx)
-                                        || homePath
+                                        || HOME_PATH
                                     );
                             let handler = routes[rawPath];
                             if (!handler) handler = routes[rawPath.toLowerCase()];
@@ -114,7 +119,7 @@ const
                                 !handler // verify route
                                 || req.method != handler.method // verify method
                             ) {
-                                res.writeHead(404);
+                                res.writeHead(STATUS_NOT_FOUND);
                                 res.end();
                                 return
                             };
@@ -123,9 +128,9 @@ const
 
                                 const
                                     // read IP
-                                    ips: string = req.headers[x_forwarded_for]?.toString()
+                                    ips: string = req.headers[X_FORWARDED_FOR]?.toString()
                                         || req.socket.remoteAddress
-                                        || req.headers[cf_connecting_ip]?.toString()
+                                        || req.headers[CF_CONNECTING_IP]?.toString()
                                         || ``,
 
                                     // req type
@@ -134,11 +139,11 @@ const
                                 if (isPOST) {
                                     // reject oversized payloads up front
                                     if (
-                                        Number(req.headers[content_length])
+                                        Number(req.headers[CONTENT_LENGTH])
                                         > maxBodySize
                                     ) {
-                                        res.writeHead(413, acceptedHeader);
-                                        res.end(payloadTooLargeResponse);
+                                            res.writeHead(STATUS_PAYLOAD_TOO_LARGE, ACCEPTED_HEADER);
+                                        res.end(PAYLOAD_TOO_LARGE_RESPONSE);
                                         return
                                     };
 
@@ -149,8 +154,8 @@ const
                                     for await (const chunk of req) {
                                         size += chunk.length;
                                         if (size > maxBodySize) {
-                                            res.writeHead(413, acceptedHeader);
-                                            res.end(payloadTooLargeResponse);
+                                        res.writeHead(STATUS_PAYLOAD_TOO_LARGE, ACCEPTED_HEADER);
+                                            res.end(PAYLOAD_TOO_LARGE_RESPONSE);
                                             req.destroy();
                                             return
                                         };
@@ -160,16 +165,16 @@ const
 
                                     // add body
                                     if (
-                                        req.headers[content_type]
+                                        req.headers[CONTENT_TYPE_LOWERCASE]
                                             ?.toLowerCase()
-                                            ?.includes(application_json)
+                                            ?.includes(APPLICATION_JSON)
                                     ) {
                                         // json body
                                         try {
                                             reqProcess.body = JSON.parse(body);
                                         } catch {
-                                            res.writeHead(400, acceptedHeader);
-                                            res.end(invalidJsonResponse);
+                                            res.writeHead(STATUS_BAD_REQUEST, ACCEPTED_HEADER);
+                                            res.end(INVALID_JSON_RESPONSE);
                                             return
                                         };
                                     } else {
@@ -211,7 +216,7 @@ const
                     // start server
                     server.listen(
                         port,
-                        () => console.log(logTime(), `Server Online`, port)
+                        () => console.log(logTime(), SERVER_ONLINE_MESSAGE, port)
                     );
                 },
                 processor = ({
@@ -220,7 +225,7 @@ const
                     description,
                     process,
                 }: ServerRouteInputs) => {
-                    if (endPoint == homePath || !endPoint) endPoint = ``;
+                    if (endPoint == HOME_PATH || !endPoint) endPoint = ``;
                     routes[`/${endPoint}`?.toLowerCase()] = { method, description, process };
                 };
 

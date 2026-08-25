@@ -47,3 +47,18 @@ startListener<AccessData>({
     listeners,
 });
 ```
+
+## Faster Request Header (Frontend only)
+To make browsers skip the `OPTIONS` (preflight) call, send the request with `Content-Type: text/plain;charset=UTF-8;type=application/json`. Because `text/plain` is a CORS "simple request" content type, the browser sends the request directly without a preflight.
+
+```ts
+const FASTER_HEADER: OutgoingHttpHeaders = {
+    [`Content-Type`]: `text/plain;charset=UTF-8;type=application/json`,
+};
+
+fetch(`https://api.example.com/test`, {
+    method: `POST`,
+    headers: FASTER_HEADER,
+    body: JSON.stringify({ hello: `world` }),
+});
+```

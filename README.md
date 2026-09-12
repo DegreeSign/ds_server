@@ -44,7 +44,7 @@ const
     },
     listeners: ListenerSpecs<AccessData>[] = [{
         method: `POST`,
-        endPoint: `test`,
+        endPoint: `test`, // Accessible at https://api.example.com/api/test
         task: `testing API`,
         fun: (p) => {
             console.log(`received`, Object.keys(p.req.body));
@@ -77,6 +77,79 @@ setServerConfig({
 });
 ```
 
+## Deployment behind Apache (HTTPS reverse proxy)
+The SDK serves plain HTTP/1.1 and is meant to run behind a TLS-terminating reverse proxy. Let Apache own HTTPS and proxy cleartext HTTP to the SDK's port.
+
+### Apache Config
+Enable the required modules (`a2enmod ssl proxy proxy_http headers rewrite`):
+
+```apache
+# Server IP and Node port
+Define main_ip 127.0.0.1
+Define port_api 1234
+
+# Publicly accessible static files directory served directly by Apache
+<Directory /var/www/public_data>
+	Options -Indexes +FollowSymLinks
+	AllowOverride All
+	Require all granted
+</Directory>
+
+# HTTPS virtual host
+<VirtualHost *:443>
+
+    # Restrict Access
+	<IfModule mod_headers.c>
+		Header set Cache-Control "max-age=86400, public"
+        <IfModule mod_rewrite.c>
+            RewriteEngine On
+            RewriteCond %{HTTP:Origin} ^(https://example\.com|http://localhost:${port_api}|https://localhost:${port_api})$ [NC]
+            RewriteRule ^ - [E=ORIGIN:%{HTTP:Origin}]
+            Header set Access-Control-Allow-Origin "%{ORIGIN}e" env=ORIGIN
+        </IfModule>
+    </IfModule>
+
+    # Allow Unrestricted (useful for third-party access to a certain directory in public files)
+    <Directory /var/www/public_data/shared>
+		Header set Access-Control-Allow-Origin *
+		Options -Indexes
+	</Directory>
+
+	# SSL (obtained from a trusted CA)
+	SSLEngine on
+	SSLCertificateFile /etc/cer/example/public.crt
+	SSLCertificateKeyFile /etc/cer/example/private.key
+
+	# Server data
+	ServerName api.example.com
+	ServerAdmin admin@example.com
+	DocumentRoot /var/www/public_data
+	ErrorDocument 404 https://example.com
+
+	# Node ports
+	ProxyPreserveHost On
+	ProxyPass /api http://${main_ip}:${port_api}
+	ProxyPassReverse /api http://${main_ip}:${port_api}
+</VirtualHost>
+```
+
+### Node listener
+```ts
+const port = 1234;
+startListener<AccessData>({
+    port,
+    allowedOrigins: [`https://example.com`, `http://localhost:${port}`, `https://localhost:${port}`],
+    listenProcessor,
+    listeners,
+});
+```
+
+Notes:
+- `mod_proxy` adds `X-Forwarded-For`; the SDK reads it to resolve the client IP.
+- `ProxyPass` strips the matched prefix, so register routes without `/api` (e.g. `/test`, not `/api/test`).
+- The SDK binds all interfaces; firewall its port so only the proxy can reach it.
+- Keep `ProxyPass` on `http://` — the SDK does not terminate TLS.
+
 ## Faster Request Header (Frontend only)
 To make browsers skip the `OPTIONS` (preflight) call, send the request with `Content-Type: text/plain;charset=UTF-8;type=application/json`. Because `text/plain` is a CORS "simple request" content type, the browser sends the request directly without a preflight.
 
@@ -85,7 +158,7 @@ const FASTER_HEADER: OutgoingHttpHeaders = {
     [`Content-Type`]: `text/plain;charset=UTF-8;type=application/json`,
 };
 
-fetch(`https://api.example.com/test`, {
+fetch(`https://api.example.com/api/test`, {
     method: `POST`,
     headers: FASTER_HEADER,
     body: JSON.stringify({ hello: `world` }),

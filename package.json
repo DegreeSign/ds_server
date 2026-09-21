@@ -1,6 +1,6 @@
 {
   "name": "@degreesign/server",
-  "version": "0.4.3",
+  "version": "1.0.0",
   "main": "dist/node/degreesign.node.min.js",
   "module": "dist/node/degreesign.node.min.js",
   "browser": "dist/browser/degreesign.min.js",
@@ -9,8 +9,23 @@
     "build": "webpack"
   },
   "keywords": [
-    "nodejs API server",
-    "nodejs API setup",
+    "rest api server sdk",
+    "nodejs api server",
+    "typescript server sdk",
+    "native http server",
+    "node http createServer",
+    "framework-free http server",
+    "no express",
+    "api routing",
+    "cors",
+    "json body parser",
+    "request hardening",
+    "aes-256 encryption",
+    "hmac",
+    "hcaptcha",
+    "totp",
+    "one-time password",
+    "server-side cache",
     "nodejs server setup",
     "degreesign"
   ],
@@ -24,7 +39,7 @@
     "url": "https://github.com/DegreeSign/ds_server/issues"
   },
   "license": "MIT",
-  "description": "DegreeSign Server SDK gives instant API server setup to provide REST API for any project",
+  "description": "Framework-free TypeScript REST API server SDK built on Node's native node:http — routing, CORS, JSON parsing, AES-256 encryption, HMAC, hCaptcha, TOTP and cache/file helpers.",
   "devDependencies": {
     "@types/node": "^22.10.2",
     "@types/speakeasy": "^2.0.10",
@@ -41,8 +56,8 @@
     "webpack-dev-server": "^5.2.0"
   },
   "dependencies": {
-    "@degreesign/cache": "^0.0.4",
-    "@degreesign/utils": "^1.0.2",
+    "@degreesign/cache": "^1.0.0",
+    "@degreesign/utils": "^1.0.3",
     "hcaptcha": "^0.2.0",
     "speakeasy": "^2.0.0"
   },

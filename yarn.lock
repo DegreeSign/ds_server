@@ -9,15 +9,15 @@
   dependencies:
     "@jridgewell/trace-mapping" "0.3.9"
 
-"@degreesign/cache@^0.0.4":
-  version "0.0.4"
-  resolved "https://registry.yarnpkg.com/@degreesign/cache/-/cache-0.0.4.tgz#3f628491bda1b36b3d24c249f56d3134ed94a06e"
-  integrity sha512-kns+sMl76KSMGgrh7xLLCk80vgKKrzWmQ+xafJr/C7fJme3H5rBpMQE1B77go/csCjQYOYBETvewMzfz67JpNg==
+"@degreesign/cache@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@degreesign/cache/-/cache-1.0.0.tgz#53502f890033f84352828da577ea294655cbdb5b"
+  integrity sha512-tMx1j4e/5V5lpJ9tn0ls4Hqmk8EIz90BqzX2sIbwlmqQ6zgSa9yJ2QFaloYbHsyyfkY/7dy0ndFDmBKL+p1+Pw==
 
-"@degreesign/utils@^1.0.2":
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/@degreesign/utils/-/utils-1.0.2.tgz#0f97fedd54aaf052f668f4aa0b32eaee25de5cd8"
-  integrity sha512-pevKUFTDPes9L/GKfQxtyP9YGCoqrPZ0deBiprpH0hFwUmJsi1+G+y08HRaOb0IQ8hagyxQt8rObx/H4q48zMQ==
+"@degreesign/utils@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@degreesign/utils/-/utils-1.0.3.tgz#7beebd36a50bd88f53c70d8e271f362338d5a5ad"
+  integrity sha512-SgVYthDe5OC23uA+bEXNmBfmYOIrf2cL4ACbnDM2/hY2nwbxcUflVx7k60kwqEKcEvOhcEGeSeRUAmwUmEZRqA==
 
 "@discoveryjs/json-ext@0.5.7":
   version "0.5.7"

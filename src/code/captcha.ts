@@ -1,18 +1,39 @@
-import { verify } from "hcaptcha"
-import { serverConfig } from "./config";
+import { logTime, serverConfig } from "./config";
+import { CONTENT_TYPE, POST } from "./constants";
+import { CaptchaResponse } from "./types";
 
 const
+    CAPTCHA_URL = `https://hcaptcha.com/siteverify`,
+    CAPTCHA_HEADER = {
+        [CONTENT_TYPE]: `application/x-www-form-urlencoded`
+    },
     /** Captcha Verification */
-    capVerify = async (token?: string) => {
+    capVerify = async (token?: string, remoteIP?: string): Promise<boolean> => {
         try {
-            if (token) {
-                const capRes = await verify(serverConfig.captchaSecret, token)
-                return capRes.success === true
-            };
+            if (!token || typeof token != `string`) return false
+
+            const
+                body = new URLSearchParams({
+                    secret: serverConfig.captchaSecret,
+                    response: token
+                });
+
+            if (remoteIP) body.set(`remoteip`, remoteIP);
+
+            const response = await fetch(CAPTCHA_URL, {
+                method: POST,
+                headers: CAPTCHA_HEADER,
+                body,
+                signal: AbortSignal.timeout(serverConfig.requestTimeoutMs)
+            });
+
+            if (!response.ok) return false
+            const data = await response.json() as CaptchaResponse;
+            return data?.success === true
         } catch (e) {
-            console.log(`Captcha Function Failed`, e);
+            console.log(logTime(), `Captcha Function Failed`, e);
         };
-        return
+        return false
     };
 
 export {

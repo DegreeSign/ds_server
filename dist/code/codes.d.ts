@@ -3,8 +3,8 @@ declare const
 genAPI: (length: number) => string, 
 /** Random code */
 genRandomCodeSize: () => string, 
-/** Short code */
+/** Short code, not for auth */
 genShortCode: () => string, 
 /** Verify API Code */
-verAPI: (auth: string, t: string) => boolean | undefined;
+verAPI: (auth: string, t: string) => boolean;
 export { genAPI, genRandomCodeSize, genShortCode, verAPI, };

@@ -7,6 +7,10 @@ interface ProcessInputs {
     req: ProcessReq;
     res: ServerResponse<IncomingMessage>;
 }
+interface CaptchaResponse {
+    success?: boolean;
+    'error-codes'?: string[];
+}
 type ServerMethods = `GET` | `POST`;
 interface ServerRoute {
     /** Route Method */
@@ -69,4 +73,4 @@ interface ServerConfig {
     /** Max requests per keep-alive socket (0 = unlimited) */
     maxRequestsPerSocket: number;
 }
-export { ProcessReq, ProcessInputs, ServerMethods, ServerRoute, ServerRouteObj, ServerRouteInputs, ServerFunctions, APIData, ListenerSpecs, ServerConfig, };
+export { ProcessReq, ProcessInputs, CaptchaResponse, ServerMethods, ServerRoute, ServerRouteObj, ServerRouteInputs, ServerFunctions, APIData, ListenerSpecs, ServerConfig, };

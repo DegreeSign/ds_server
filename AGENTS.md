@@ -1,5 +1,7 @@
 # AGENTS.md
 
+On start load `coding` and `npm` skills from `npx @degreesign/skills` (likely already installed)
+
 ## Build & dist rules
 
 - **Never build the package** (`webpack` / `tsc` emit). The `dist/` directory is a committed

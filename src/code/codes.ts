@@ -8,21 +8,21 @@ const
     ) => speakeasy.generateSecret({ length }).base32,
     /** Random code */
     genRandomCodeSize = () => genAPI(Math.floor(Math.random() * 11 + 20)),
-    /** Short code */
+    /** Short code, not for auth */
     genShortCode = () => genAPI(4),
     /** Verify API Code */
-    verAPI = (auth: string, t: string) => {
+    verAPI = (auth: string, t: string): boolean => {
         try {
             return speakeasy.totp
                 .verify({
                     secret: auth,
                     encoding: `base32`,
                     token: t
-                });
+                }) === true;
         } catch (e) {
             console.log(logTime(), `Verifying auth code failed`, e);
-            return undefined
         };
+        return false;
     };
 
 export {

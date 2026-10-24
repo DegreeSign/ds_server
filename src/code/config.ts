@@ -1,4 +1,5 @@
 import { getCacheDir, setCacheDir } from "@degreesign/cache";
+import { REQUEST_TIMEOUT_MIN_MS } from "./constants";
 import { ServerConfig } from "./types";
 
 const
@@ -59,7 +60,7 @@ const
         if (typeof maxBodySizeMB == `number` && maxBodySizeMB > 0)
             serverConfig.maxBodySizeMB = maxBodySizeMB;
 
-        if (typeof requestTimeoutMs == `number` && requestTimeoutMs > 0)
+        if (typeof requestTimeoutMs == `number` && requestTimeoutMs >= REQUEST_TIMEOUT_MIN_MS)
             serverConfig.requestTimeoutMs = requestTimeoutMs;
 
         if (typeof headersTimeoutMs == `number` && headersTimeoutMs > 0)

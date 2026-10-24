@@ -44,11 +44,17 @@ import {
 const
     /** Connection End */
     ff = (res: ServerResponse<IncomingMessage>) => {
-        if (!res) return
+        if (!res || res.writableEnded || res.destroyed) return
         try {
+            if (res.headersSent) {
+                res.destroy();
+                return
+            };
             res.writeHead(STATUS_GATEWAY_TIMEOUT);
             res.end();
-        } catch (e) { };
+        } catch (e) {
+            try { res.destroy(); } catch (e) { };
+        };
     },
     /** Connection Response */
     rf = (
@@ -58,10 +64,13 @@ const
     ) => {
         if (!res) return
         try {
+            const
+                successState =
+                    success === undefined ? data?.e == undefined : success,
+                // serialise before sending headers, so failures can still be answered
+                payload = JSON.stringify({ success: successState, ...data });
             res.writeHead(STATUS_OK, ACCEPTED_HEADER);
-            const successState =
-                success === undefined ? data?.e == undefined : success;
-            res.end(JSON.stringify({ success: successState, ...data }));
+            res.end(payload);
         } catch (e) { ff(res); };
     },
     /** Server system */

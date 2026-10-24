@@ -1,9 +1,8 @@
 {
   "name": "@degreesign/server",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "main": "dist/node/degreesign.node.min.js",
   "module": "dist/node/degreesign.node.min.js",
-  "browser": "dist/browser/degreesign.min.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "webpack"
@@ -58,7 +57,6 @@
   "dependencies": {
     "@degreesign/cache": "^1.0.0",
     "@degreesign/utils": "^1.0.3",
-    "hcaptcha": "^0.2.0",
     "speakeasy": "^2.0.0"
   },
   "files": [

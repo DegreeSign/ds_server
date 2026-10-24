@@ -10,6 +10,11 @@ interface ProcessInputs {
     res: ServerResponse<IncomingMessage>;
 }
 
+interface CaptchaResponse {
+    success?: boolean;
+    'error-codes'?: string[];
+}
+
 type ServerMethods = `GET` | `POST`;
 
 interface ServerRoute {
@@ -83,6 +88,7 @@ interface ServerConfig {
 export {
     ProcessReq,
     ProcessInputs,
+    CaptchaResponse,
     ServerMethods,
     ServerRoute,
     ServerRouteObj,

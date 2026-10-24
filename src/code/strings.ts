@@ -10,13 +10,13 @@ const
         txt && typeof txt == `string` ? txt.slice(txt.length - len)
             : ``,
     /** Validate Length */
-    validLen = (len: number, txt?: string, checkNeg?: boolean) =>
-        txt && typeof txt == `string` && txt.length < len && (
+    validLen = (len: number, txt?: string, checkNeg?: boolean): boolean =>
+        !!txt && typeof txt == `string` && txt.length < len && (
             !checkNeg || !txt.match(serverConfig.sanitisationStringExtended)
         ),
     /** Validate Length */
-    validLenEq = (len: number, txt?: string, checkNeg?: boolean) =>
-        txt && typeof txt == `string` && txt.length == len && (
+    validLenEq = (len: number, txt?: string, checkNeg?: boolean): boolean =>
+        !!txt && typeof txt == `string` && txt.length == len && (
             !checkNeg || !txt.match(serverConfig.sanitisationStringExtended)
         );
 

@@ -44,6 +44,10 @@ const
 		};
 		return ``
 	},
+	/**
+	 * Computes a hex HMAC digest.
+	 * It does not verify a signature.
+	 */
 	hmacValid = (parm: {
 		data: string,
 		secret: string,

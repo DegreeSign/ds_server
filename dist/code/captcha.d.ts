@@ -1,4 +1,4 @@
 declare const 
 /** Captcha Verification */
-capVerify: (token?: string) => Promise<boolean | undefined>;
+capVerify: (token?: string, remoteIP?: string) => Promise<boolean>;
 export { capVerify, };

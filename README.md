@@ -184,11 +184,11 @@ const plain = de(token);                  // "secret payload"
 
 const signature = hmacValid({ data: `payload`, secret: `shared-secret` });
 
-const human = await capVerify(hCaptchaToken); // true | false | undefined
+const human = await capVerify(hCaptchaToken, clientIP); // bind to visitor IP, not a proxy
 
-const secret = genAPI(20);                // base32 TOTP secret
-const valid = verAPI(secret, userCode);   // true | false | undefined
-const shortCode = genShortCode();         // base32 code of length 4
+const secret = genAPI(20);                // base32 secret, longer than 20 chars
+const valid = verAPI(secret, userCode);   // true | false
+const shortCode = genShortCode();         // 7 chars, about 32 bits, not for auth
 ```
 
 ### 5. Files, cache and outbound HTTP
@@ -222,7 +222,7 @@ const api = await getData(`https://api.example.com/data`);
 | --- | --- | --- |
 | `startListener` | `startListener<T>(options: { port: number; allowedOrigins?: string[]; listenProcessor: (p: APIData<T>) => any; listeners: ListenerSpecs<T>[] }): void` | Registers every listener and starts the native `http` server on `port`. Default listener method is `POST`. |
 | `rf` | `rf(res: ServerResponse, data: any, success?: boolean): void` | Sends a `200` JSON response shaped `{ success, ...data }`. When `success` is omitted it is derived from the absence of a `.e` property. |
-| `ff` | `ff(res: ServerResponse): void` | Safely ends a connection with HTTP `504 Gateway Timeout`; used for failed or timed-out requests. |
+| `ff` | `ff(res: ServerResponse): void` | Safely ends a connection with HTTP `504 Gateway Timeout`; used for failed or timed-out requests. Destroys the connection instead when headers were already sent. |
 
 ### Configuration
 
@@ -232,7 +232,7 @@ const api = await getData(`https://api.example.com/data`);
 | `getServerConfig` | `getServerConfig(): ServerConfig` | Returns the current configuration object. |
 | `setServerConfig` | `setServerConfig(config: Partial<ServerConfig>): void` | Merges a partial configuration; only valid values are applied. |
 
-`ServerConfig` accepts the following fields: `cacheDir`, `encryptionKey`, `encryptionSalt`, `captchaSecret`, `sanitisationString`, `sanitisationStringExtended`, `overrideUserAgent`, `maxBodySizeMB`, `requestTimeoutMs`, `headersTimeoutMs`, `keepAliveTimeoutMs` and `maxRequestsPerSocket`.
+`ServerConfig` accepts the following fields: `cacheDir`, `encryptionKey`, `encryptionSalt`, `captchaSecret`, `sanitisationString`, `sanitisationStringExtended`, `overrideUserAgent`, `maxBodySizeMB`, `requestTimeoutMs`, `headersTimeoutMs`, `keepAliveTimeoutMs` and `maxRequestsPerSocket`. `requestTimeoutMs` values below `5000` ms are ignored.
 
 ### Types
 
@@ -255,16 +255,16 @@ const api = await getData(`https://api.example.com/data`);
 
 | Export | Signature | Description |
 | --- | --- | --- |
-| `capVerify` | `capVerify(token?: string): Promise<boolean \| undefined>` | Verifies an hCaptcha token against `captchaSecret` using the bundled `hcaptcha` client. |
+| `capVerify` | `capVerify(token?: string, remoteIP?: string): Promise<boolean>` | Verifies an hCaptcha token against `captchaSecret`, optionally passing `remoteIP` (sent as `remoteip` so hCaptcha can cross-check the token was solved from that address; an extra abuse signal, not a guaranteed rejection). Pass the real visitor IP, never a proxy address; returns `false` on missing tokens, errors or timeout. |
 
 ### API codes and TOTP
 
 | Export | Signature | Description |
 | --- | --- | --- |
-| `genAPI` | `genAPI(length: number): string` | Generates a base32 secret of the given length for TOTP/API codes. |
+| `genAPI` | `genAPI(length: number): string` | Generates a base32 secret from `length` bytes of randomness; the returned string is longer than `length`. |
 | `genRandomCodeSize` | `genRandomCodeSize(): string` | Generates a base32 secret with a random length between 20 and 30. |
-| `genShortCode` | `genShortCode(): string` | Generates a short base32 code (length `4`). |
-| `verAPI` | `verAPI(auth: string, t: string): boolean \| undefined` | Verifies a TOTP token against a base32 secret. |
+| `genShortCode` | `genShortCode(): string` | Generates a short base32 code (7 chars, about 32 bits); not for authentication. |
+| `verAPI` | `verAPI(auth: string, t: string): boolean` | Verifies a TOTP token against a base32 secret. |
 
 ### Strings and validation
 
@@ -297,7 +297,7 @@ Re-exported from `@degreesign/cache` for convenience.
 | Export | Signature | Description |
 | --- | --- | --- |
 | `getData` | `getData(url: string, body?: any, headersData?: any, noCache = true): Promise<any>` | Fetches JSON over HTTP/HTTPS; sends `POST` when a `body` is given, otherwise `GET`. Returns parsed JSON for `200`/`201`/`202`, else `undefined`. |
-| `saveFileLocally` | `saveFileLocally({ url: string; filePath: string }): Promise<boolean>` | Streams a remote file to a local path; resolves `true` on success. |
+| `saveFileLocally` | `saveFileLocally({ url: string; filePath: string }): Promise<boolean>` | Streams a remote file to a local path through a temporary file that atomically replaces the target; resolves `true` on success, `false` on HTTP errors, write failures or a stalled connection. |
 | `cmd` | `cmd(command: string): string \| number` | Runs a shell command with `execSync`, returning its output, `1` when empty, or `0` on error. |
 
 ## Deployment behind Apache (HTTPS reverse proxy)
@@ -413,7 +413,7 @@ It is a **Node.js server SDK** (Node.js 18+ is required) and runs wherever Node'
 
 ### Does it have any dependencies?
 
-Yes. Runtime dependencies are `@degreesign/cache`, `@degreesign/utils`, `hcaptcha` and `speakeasy`. It does **not** depend on Express, Koa, Fastify or any other web framework.
+Yes. Runtime dependencies are `@degreesign/cache`, `@degreesign/utils` and `speakeasy`. It does **not** depend on Express, Koa, Fastify or any other web framework.
 
 ### Does it support TypeScript?
 

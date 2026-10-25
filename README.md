@@ -13,6 +13,7 @@
 
 - [What is DegreeSign Server SDK?](#what-is-degreesign-server-sdk)
 - [Why DegreeSign Server SDK?](#why-degreesign-server-sdk)
+- [Architecture](#architecture)
 - [Installation](#installation)
   - [npm](#npm)
   - [yarn](#yarn)
@@ -57,6 +58,10 @@ DegreeSign Server SDK is a lightweight **TypeScript REST API server SDK** that l
 - **Fully typed in TypeScript.** Written in TypeScript and ships declaration files for excellent autocomplete and IntelliSense.
 - **Tiny and tree-shakeable.** Bundled, minified, marked side-effect free, and published with a single dependency tree.
 - **Easy to monitor.** Logging, processing and response helpers (`rf`, `ff`) make consistent JSON responses trivial.
+
+## Architecture
+
+[`docs/architecture.html`](https://degreesign.github.io/ds_server/architecture.html) — published by GitHub Pages from the `docs/` directory — is a self-contained dependency map of the package: bands from the host boundary to the build, every module and meaningful function with its real line and signature, the typed relations between them, the primary request flow and the request-outcome states. Open it offline in a browser — no server, network or build step.
 
 ## Installation
 

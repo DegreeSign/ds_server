@@ -1,6 +1,6 @@
 {
   "name": "@degreesign/server",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "main": "dist/node/degreesign.node.min.js",
   "module": "dist/node/degreesign.node.min.js",
   "types": "dist/index.d.ts",
